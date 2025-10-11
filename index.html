@@ -1,1 +1,426 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Addams Family Halloween Quiz</title>
+  <meta name="description" content="A spooky, single‑file Halloween quiz that assigns a unique Addams Family character to each player. Deploy on GitHub Pages easily."/>
+  <style>
+    :root{
+      --bg:#0b0b10;           /* near black */
+      --ink:#e8e8f3;          /* bone white */
+      --muted:#b8b8c8;        /* dusty */
+      --accent:#8a2be2;       /* eldritch purple */
+      --accent2:#00ffa6;      /* eerie green */
+      --card:#12121a;         /* deep slate */
+      --edge:#242438;         /* outline */
+      --danger:#ff3b3b;       /* crimson */
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--ink); background:radial-gradient(1200px 800px at 80% -10%, #161626 0%, transparent 60%),
+                        radial-gradient(800px 600px at -10% 110%, #1a1a2a 0%, transparent 60%),
+                        var(--bg);
+      line-height:1.55;
+    }
+    .max{max-width:980px;margin:0 auto;padding:24px}
+    header{display:flex;gap:16px;align-items:center;justify-content:space-between}
+    .title{display:flex;gap:12px;align-items:center}
+    .title h1{font-size:clamp(1.4rem, 2.6vw, 2.2rem);margin:0;letter-spacing:1px}
+    .badge{font-size:.8rem;padding:.25rem .6rem;border:1px solid var(--edge);border-radius:999px;color:var(--muted)}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01));border:1px solid var(--edge);border-radius:18px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+    .grid{display:grid;gap:16px}
+    @media(min-width:780px){.grid-cols-2{grid-template-columns:1fr 1fr}}
+    h2{margin:.2rem 0 1rem;font-size:1.2rem;color:var(--muted);font-weight:600}
+    button{cursor:pointer;border:none;border-radius:14px;padding:12px 16px;font-weight:700}
+    .btn{background:linear-gradient(180deg, var(--accent), #6120a8);color:white}
+    .btn:hover{filter:brightness(1.05)}
+    .btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--edge)}
+    .btn-danger{background:linear-gradient(180deg, var(--danger), #b90f1b);color:white}
+    .muted{color:var(--muted)}
+    .small{font-size:.9rem}
+    .center{display:flex;align-items:center;justify-content:center}
+
+    /* spooky accents */
+    .web{
+      position:relative;overflow:hidden;border-radius:18px
+    }
+    .web::before,.web::after{
+      content:"";position:absolute;inset:0;pointer-events:none;border-radius:18px
+    }
+    .web::before{background:radial-gradient(200px 120px at 10% 5%, rgba(138,43,226,.2), transparent 60%),
+                               radial-gradient(180px 110px at 90% 95%, rgba(0,255,166,.12), transparent 60%)}
+    .web::after{background:
+      repeating-conic-gradient(from 0deg, rgba(255,255,255,.05) 0 6deg, transparent 6deg 12deg);
+      mask:radial-gradient(circle at 50% 50%, rgba(0,0,0,.85) 0 45%, transparent 55% 100%)
+    }
+
+    /* quiz */
+    .progress{height:10px;background:#23233a;border-radius:999px;overflow:hidden}
+    .progress > div{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));width:0}
+    .options{display:grid;gap:10px;margin-top:12px}
+    .option{border:1px solid var(--edge);background:rgba(255,255,255,.02);padding:12px;border-radius:12px;display:flex;align-items:center;gap:12px}
+    .option input{accent-color:var(--accent2)}
+
+    .footer{margin-top:28px;display:flex;gap:10px;flex-wrap:wrap}
+    .tag{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--edge);border-radius:999px;padding:6px 10px;color:var(--muted)}
+
+    .pill{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;background:#1a1a28;border:1px solid var(--edge)}
+
+    .hidden{display:none}
+    .fade{animation:fade .35s ease}
+    @keyframes fade{from{opacity:.3;transform:translateY(4px)}to{opacity:1;transform:none}}
+    a{color:var(--accent2);text-decoration:none}
+    a:hover{text-decoration:underline}
+  </style>
+</head>
+<body>
+  <div class="max">
+    <header>
+      <div class="title">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 2c-1.5 0-3 .6-4.2 1.8C6.6 5 6 6.5 6 8v2H4l2 4v6h12v-6l2-4h-2V8c0-1.5-.6-3-1.8-4.2C15 2.6 13.5 2 12 2Z" stroke="currentColor" stroke-width="1.25"/><path d="M9 10c0-1.657 1.343-3 3-3s3 1.343 3 3" stroke="currentColor" stroke-width="1.25"/></svg>
+        <h1>Which Addams Are You? — Halloween Quiz</h1>
+      </div>
+      <span class="badge">Single‑file • GitHub Pages ready</span>
+    </header>
+
+    <section class="grid grid-cols-2" id="setup">
+      <div class="card web fade">
+        <h2>Party mode (no repeats)</h2>
+        <p class="muted">Up to 14 players can take the quiz one‑by‑one. Each character is assigned only once. Perfect for a Halloween get‑together 👻</p>
+        <form id="playersForm" class="grid" autocomplete="off">
+          <label>
+            <span class="small muted">How many players?</span>
+            <input id="playerCount" type="number" min="1" max="14" value="1" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--edge);background:#111320;color:var(--ink)" />
+          </label>
+          <div id="playerNames" class="grid"></div>
+          <div>
+            <button class="btn" type="submit">Start the quiz</button>
+            <button class="btn-ghost" type="button" id="fillSample">Fill sample names</button>
+          </div>
+        </form>
+      </div>
+      <div class="card fade">
+        <h2>About</h2>
+        <p>This is a lightweight site with zero dependencies. Just drop this file into a GitHub repo as <code>index.html</code> and enable GitHub Pages. Works great on mobile.</p>
+        <div class="footer">
+          <span class="pill">🎃 Halloween theme</span>
+          <span class="pill">🪄 Personality quiz</span>
+          <span class="pill">🔒 No repeats across players</span>
+          <span class="pill">🌓 Dark‑mode only (spooky!)</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="quiz" class="card hidden fade" aria-live="polite"></section>
+
+    <section id="result" class="card hidden fade" aria-live="polite"></section>
+
+    <section id="roster" class="card hidden fade"></section>
+
+    <footer class="center" style="margin:28px 0 12px">
+      <p class="small muted">Built for fans; this is an homage. Character names are trademarks of their respective owners.</p>
+    </footer>
+  </div>
+
+<script>
+/*************************
+ * Data: Characters (14) *
+ *************************/
+const CHARACTERS = [
+  { id:"gomez", name:"Gomez Addams",      blurb:"A flamboyant romantic with a saber and a smile.", tags:{leader:2, romantic:3, flamboyant:3, eccentric:2} },
+  { id:"morticia", name:"Morticia Addams", blurb:"Elegance, roses without the roses, serene and witchy.", tags:{elegant:3, witchy:2, leader:1} },
+  { id:"wednesday", name:"Wednesday Addams", blurb:"Deadpan, clever, and delightfully morbid.", tags:{deadpan:3, mischief:2, chaotic:1} },
+  { id:"pugsley", name:"Pugsley Addams",    blurb:"Cheerful chaos and contraptions galore.", tags:{mischief:3, chaotic:2, cute:1} },
+  { id:"fester", name:"Uncle Fester",       blurb:"Explosive ideas and a heart of (slightly charred) gold.", tags:{mad_scientist:3, eccentric:2, chaotic:1} },
+  { id:"grandmama", name:"Grandmama",       blurb:"Potions, fortunes, and a cackle for the ages.", tags:{witchy:3, eccentric:2} },
+  { id:"lurch", name:"Lurch",               blurb:"You rang? Stoic, loyal, unexpectedly musical.", tags:{loyal:3, handy:1, leader:1} },
+  { id:"thing", name:"Thing",               blurb:"A helping hand—literally—swift and loyal.", tags:{handy:3, loyal:2, mischief:1} },
+  { id:"cousin_itt", name:"Cousin Itt",     blurb:"Fast talk, faster cars, and impeccable style.", tags:{flamboyant:3, socialite:2, eccentric:1} },
+  { id:"pubert", name:"Pubert Addams",      blurb:"The tiniest agent of adorable pandemonium.", tags:{cute:3, chaotic:2} },
+  { id:"ophelia", name:"Ophelia Frump",     blurb:"Hopeless romantic with a flower crown.", tags:{romantic:2, elegant:1, socialite:1} },
+  { id:"debbie", name:"Debbie Jellinsky",   blurb:"Glam, charm, and the sharpest side‑eye.", tags:{socialite:3, flamboyant:1, elegant:1} },
+  { id:"abigail", name:"Abigail Craven",     blurb:"Schemes, secrets, and scientific flair.", tags:{mad_scientist:2, socialite:1} },
+  { id:"margaret", name:"Margaret Alford",  blurb:"Prim, proper, and delightfully susceptible to the macabre.", tags:{socialite:2, elegant:2} },
+];
+
+/************************
+ * Data: Quiz Questions  *
+ ************************/
+const QUESTIONS = [
+  { q:"Pick your ideal spooky soirée:", opts:[
+    {t:"Moonlit fencing duel", tag:"flamboyant"},
+    {t:"Midnight tea in the conservatory", tag:"elegant"},
+    {t:"Build a mysterious contraption", tag:"mad_scientist"},
+    {t:"Plot (harmless?) pranks with siblings", tag:"mischief"}
+  ]},
+  { q:"Your communication style:", opts:[
+    {t:"Deadpan one‑liners", tag:"deadpan"},
+    {t:"Grand romantic speeches", tag:"romantic"},
+    {t:"Short, efficient, helpful", tag:"handy"},
+    {t:"Grunts… but heartfelt", tag:"loyal"}
+  ]},
+  { q:"Choose a pet project:", opts:[
+    {t:"Cultivate carnivorous plants", tag:"witchy"},
+    {t:"Tune the harpsichord", tag:"elegant"},
+    {t:"Souped‑up micro‑car mods", tag:"flamboyant"},
+    {t:"Boom‑but‑safe experiments", tag:"mad_scientist"}
+  ]},
+  { q:"Your vibe at a family reunion:", opts:[
+    {t:"Leader of the games", tag:"leader"},
+    {t:"Quiet observer with a smirk", tag:"deadpan"},
+    {t:"Social butterfly", tag:"socialite"},
+    {t:"Cause cute chaos", tag:"cute"}
+  ]},
+  { q:"Preferred tool:", opts:[
+    {t:"Saber (for fun)", tag:"flamboyant"},
+    {t:"Crystal ball", tag:"witchy"},
+    {t:"Wrench (and a good scuttle)", tag:"handy"},
+    {t:"Lightning coil", tag:"mad_scientist"}
+  ]},
+  { q:"Pick a motto:", opts:[
+    {t:"Carpe noctem!", tag:"eccentric"},
+    {t:"Sic gorgiamus allos subjectatos nunc", tag:"leader"},
+    {t:"Silence speaks volumes", tag:"deadpan"},
+    {t:"If it goes boom, we zoom", tag:"chaotic"}
+  ]},
+  { q:"Go‑to outfit detail:", opts:[
+    {t:"Pinstripes & panache", tag:"flamboyant"},
+    {t:"Floor‑length glam", tag:"elegant"},
+    {t:"Something practical for crawling", tag:"handy"},
+    {t:"Whatever hides soot marks", tag:"chaotic"}
+  ]},
+  { q:"Your helper energy:", opts:[
+    {t:"Always there at a moment’s notice", tag:"loyal"},
+    {t:"Advice, potions, and snacks", tag:"witchy"},
+    {t:"Emotional support sword", tag:"romantic"},
+    {t:"Prank partner", tag:"mischief"}
+  ]}
+];
+
+/****************
+ * State & Util *
+ ****************/
+let game = {
+  players: [],          // [{name, answers:[], scores:{tag:count}, character:null}]
+  remaining: new Set(CHARACTERS.map(c=>c.id)),
+  currentIndex: 0,
+};
+
+const $ = sel => document.querySelector(sel);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+function renderNameInputs(count){
+  const wrap = document.getElementById('playerNames');
+  wrap.innerHTML = '';
+  for(let i=0;i<count;i++){
+    const lab = document.createElement('label');
+    lab.innerHTML = `<span class="small muted">Player ${i+1} name</span>
+    <input type="text" name="p${i}" placeholder="e.g., Wednesday" required style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--edge);background:#111320;color:var(--ink)" />`;
+    wrap.appendChild(lab);
+  }
+}
+
+/****************
+ * Setup Screen *
+ ****************/
+const playerCountInput = document.getElementById('playerCount');
+playerCountInput.addEventListener('input', e=>{
+  let v = Math.max(1, Math.min(14, Number(e.target.value||1)));
+  renderNameInputs(v);
+});
+renderNameInputs(Number(playerCountInput.value));
+
+$('#fillSample').addEventListener('click', ()=>{
+  const samples = ["Gomez","Morticia","Wednesday","Pugsley","Fester","Grandmama","Lurch","Thing","Itt","Pubert","Ophelia","Debbie","Abigail","Margaret"];
+  $$('#playerNames input').forEach((el,i)=> el.value = samples[i] || `Player ${i+1}`);
+});
+
+$('#playersForm').addEventListener('submit', (e)=>{
+  e.preventDefault();
+  const inputs = $$('#playerNames input');
+  if(inputs.some(i=>!i.value.trim())) return alert('Please enter a name for each player.');
+  game.players = inputs.map(i=>({name:i.value.trim(), answers:[], scores:{}, character:null}));
+  $('#setup').classList.add('hidden');
+  $('#roster').classList.remove('hidden');
+  renderRoster();
+  startQuizFor(0);
+});
+
+/********
+ * Quiz *
+ ********/
+function startQuizFor(idx){
+  game.currentIndex = idx;
+  const player = game.players[idx];
+  const el = $('#quiz');
+  el.classList.remove('hidden');
+  el.innerHTML = `
+    <div class="progress" aria-hidden="true"><div id="bar"></div></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+      <div>
+        <h2>Player: <span class="pill">${escapeHtml(player.name)}</span></h2>
+        <p class="muted small">Question <span id="qNum">1</span> / ${QUESTIONS.length}</p>
+      </div>
+      <button class="btn-ghost" id="abort">Back to setup</button>
+    </div>
+    <div id="qWrap" class="fade"></div>
+    <div class="footer">
+      <button class="btn" id="next" disabled>Next</button>
+      <button class="btn-danger" id="resetPlayer">Reset player answers</button>
+    </div>
+  `;
+  $('#abort').onclick = ()=>{ if(confirm('Go back to setup? Progress will be lost.')) location.reload(); };
+  $('#resetPlayer').onclick = ()=>{ if(confirm('Reset this player\'s answers?')){ player.answers=[]; player.scores={}; renderQuestion(0); } };
+  $('#next').onclick = ()=>handleNext();
+  renderQuestion(player.answers.length || 0);
+}
+
+function renderQuestion(i){
+  const player = game.players[game.currentIndex];
+  const q = QUESTIONS[i];
+  const wrap = $('#qWrap');
+  const progress = ((i)/QUESTIONS.length)*100;
+  $('#bar').style.width = progress + '%';
+  $('#qNum').textContent = (i+1);
+  const name = `q_${i}`;
+  wrap.innerHTML = `
+    <h2 style="font-size:1.1rem">${escapeHtml(q.q)}</h2>
+    <div class="options">
+      ${q.opts.map((o,idx)=>{
+        const id = `${name}_${idx}`;
+        return `<label class="option">
+            <input type="radio" name="${name}" id="${id}" value="${o.tag}">
+            <span>${escapeHtml(o.t)}</span>
+        </label>`;
+      }).join('')}
+    </div>
+  `;
+  $$("input[name='"+name+"']").forEach(r=> r.addEventListener('change', ()=> $('#next').disabled=false));
+}
+
+function handleNext(){
+  const i = game.players[game.currentIndex].answers.length;
+  const chosen = $$(`input[name='q_${i}']:checked`)[0];
+  if(!chosen) return;
+  const player = game.players[game.currentIndex];
+  player.answers.push(chosen.value);
+  player.scores[chosen.value] = (player.scores[chosen.value]||0)+1;
+  if(player.answers.length < QUESTIONS.length){
+    renderQuestion(player.answers.length);
+  }else{
+    // Finish & assign a unique character
+    const assigned = assignCharacter(player);
+    player.character = assigned.id;
+    game.remaining.delete(assigned.id);
+    showResult(player, assigned);
+  }
+}
+
+function assignCharacter(player){
+  // Score each remaining character by dot product over tag counts
+  const remainingChars = CHARACTERS.filter(c=>game.remaining.has(c.id));
+  if(remainingChars.length === 0){
+    return { id:"none", name:"No one left!", blurb:"All characters have already been matched.", tags:{} };
+  }
+  const scores = remainingChars.map(c=>{
+    let s = 0;
+    for(const [tag,count] of Object.entries(player.scores)){
+      s += (c.tags[tag]||0)*count;
+    }
+    return { c, score:s };
+  });
+  scores.sort((a,b)=> b.score - a.score || Math.random()-0.5);
+  // If all zero, pick randomly from remaining
+  const top = scores[0].score>0 ? scores.filter(x=>x.score===scores[0].score) : scores;
+  return top[Math.floor(Math.random()*top.length)].c;
+}
+
+function showResult(player, character){
+  const el = $('#result');
+  el.classList.remove('hidden');
+  el.innerHTML = `
+    <h2 style="font-size:1.25rem;margin-bottom:.5rem">${escapeHtml(player.name)}, you are…</h2>
+    <div class="grid grid-cols-2">
+      <div class="card web" style="padding:16px">
+        <div style="display:flex;align-items:center;gap:10px;justify-content:space-between">
+          <div>
+            <div class="pill">Unique match locked</div>
+            <h3 style="margin:.6rem 0 0;font-size:1.4rem">${escapeHtml(character.name)}</h3>
+            <p class="muted">${escapeHtml(character.blurb)}</p>
+          </div>
+        </div>
+        <div class="footer">
+          ${Object.keys(character.tags).map(t=>`<span class="tag">#${t}</span>`).join('')}
+        </div>
+      </div>
+      <div>
+        <p class="muted">Share your result with friends by sending them this page link. In party mode, each character can only appear once—no duplicates!</p>
+        <div class="footer">
+          <button class="btn" id="nextPlayer">Next player</button>
+          <button class="btn-ghost" id="revealRoster">Show roster</button>
+          <button class="btn-danger" id="resetAll">Reset game</button>
+        </div>
+      </div>
+    </div>
+  `;
+  $('#nextPlayer').onclick = ()=>{
+    const i = game.currentIndex+1;
+    if(i < game.players.length) startQuizFor(i); else { alert('All players finished!'); renderRoster(true);} 
+  };
+  $('#revealRoster').onclick = ()=> renderRoster(true);
+  $('#resetAll').onclick = ()=>{ if(confirm('Reset everything and start over?')) location.reload(); };
+  renderRoster();
+}
+
+/***********
+ * Roster  *
+ ***********/
+function renderRoster(expand=false){
+  const el = $('#roster');
+  const remaining = CHARACTERS.filter(c=>game.remaining.has(c.id));
+  const taken = CHARACTERS.filter(c=>!game.remaining.has(c.id));
+
+  const playersList = game.players.map((p,i)=>{
+    const ch = p.character ? CHARACTERS.find(c=>c.id===p.character).name : '—';
+    return `<tr><td class="small muted">${i+1}</td><td>${escapeHtml(p.name)}</td><td>${escapeHtml(ch)}</td></tr>`;
+  }).join('');
+
+  el.innerHTML = `
+    <h2>Roster</h2>
+    <div class="grid grid-cols-2">
+      <div class="card" style="overflow:auto">
+        <h3 style="margin-top:0">Players</h3>
+        <table style="width:100%;border-collapse:collapse">
+          <thead><tr class="small muted"><th style="text-align:left;padding:6px 0">#</th><th style="text-align:left">Name</th><th style="text-align:left">Character</th></tr></thead>
+          <tbody>
+            ${playersList||'<tr><td colspan="3" class="muted small">No players yet.</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0">${expand? 'Assigned & Remaining' : 'Characters remaining'}</h3>
+        ${expand ? (
+          `<div class="small muted" style="margin-bottom:6px">Assigned (${taken.length}/14)</div>
+           <div class="footer" style="margin-bottom:14px">${taken.map(c=>`<span class="tag">${escapeHtml(c.name)}</span>`).join('')||'<span class="muted small">None yet</span>'}</div>`
+        ) : ''}
+        <div class="small muted" style="margin-bottom:6px">Available (${remaining.length}/14)</div>
+        <div class="footer">${remaining.map(c=>`<span class="tag">${escapeHtml(c.name)}</span>`).join('')||'<span class="muted small">All assigned</span>'}</div>
+      </div>
+    </div>
+  `;
+}
+
+/***************
+ * Utilities   *
+ ***************/
+function escapeHtml(s){
+  return s.replace(/[&<>'"]/g, c=> ({'&':'&amp;','<':'&lt;','>':'&gt;','\'':'&#39;','"':'&quot;'}[c]));
+}
+</script>
+</body>
+</html>
 
