@@ -1,426 +1,984 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Addams Family Halloween Quiz</title>
-  <meta name="description" content="A spooky, single‑file Halloween quiz that assigns a unique Addams Family character to each player. Deploy on GitHub Pages easily."/>
-  <style>
-    :root{
-      --bg:#0b0b10;           /* near black */
-      --ink:#e8e8f3;          /* bone white */
-      --muted:#b8b8c8;        /* dusty */
-      --accent:#8a2be2;       /* eldritch purple */
-      --accent2:#00ffa6;      /* eerie green */
-      --card:#12121a;         /* deep slate */
-      --edge:#242438;         /* outline */
-      --danger:#ff3b3b;       /* crimson */
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      color:var(--ink); background:radial-gradient(1200px 800px at 80% -10%, #161626 0%, transparent 60%),
-                        radial-gradient(800px 600px at -10% 110%, #1a1a2a 0%, transparent 60%),
-                        var(--bg);
-      line-height:1.55;
-    }
-    .max{max-width:980px;margin:0 auto;padding:24px}
-    header{display:flex;gap:16px;align-items:center;justify-content:space-between}
-    .title{display:flex;gap:12px;align-items:center}
-    .title h1{font-size:clamp(1.4rem, 2.6vw, 2.2rem);margin:0;letter-spacing:1px}
-    .badge{font-size:.8rem;padding:.25rem .6rem;border:1px solid var(--edge);border-radius:999px;color:var(--muted)}
-    .card{background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01));border:1px solid var(--edge);border-radius:18px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
-    .grid{display:grid;gap:16px}
-    @media(min-width:780px){.grid-cols-2{grid-template-columns:1fr 1fr}}
-    h2{margin:.2rem 0 1rem;font-size:1.2rem;color:var(--muted);font-weight:600}
-    button{cursor:pointer;border:none;border-radius:14px;padding:12px 16px;font-weight:700}
-    .btn{background:linear-gradient(180deg, var(--accent), #6120a8);color:white}
-    .btn:hover{filter:brightness(1.05)}
-    .btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--edge)}
-    .btn-danger{background:linear-gradient(180deg, var(--danger), #b90f1b);color:white}
-    .muted{color:var(--muted)}
-    .small{font-size:.9rem}
-    .center{display:flex;align-items:center;justify-content:center}
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Addams Family • Halloween Quiz (No Repeats)</title>
+<meta name="description" content="Spooky Addams Family quiz with ambience, portraits, printable certificate, and no-repeat characters shared by event code.">
 
-    /* spooky accents */
-    .web{
-      position:relative;overflow:hidden;border-radius:18px
-    }
-    .web::before,.web::after{
-      content:"";position:absolute;inset:0;pointer-events:none;border-radius:18px
-    }
-    .web::before{background:radial-gradient(200px 120px at 10% 5%, rgba(138,43,226,.2), transparent 60%),
-                               radial-gradient(180px 110px at 90% 95%, rgba(0,255,166,.12), transparent 60%)}
-    .web::after{background:
-      repeating-conic-gradient(from 0deg, rgba(255,255,255,.05) 0 6deg, transparent 6deg 12deg);
-      mask:radial-gradient(circle at 50% 50%, rgba(0,0,0,.85) 0 45%, transparent 55% 100%)
-    }
+<link rel="preload" as="image" href="assets/characters/family.webp">
+<link rel="preload" as="image" href="assets/characters/wednesday.webp">
+<link rel="preload" as="image" href="assets/characters/morticia.jpg">
+<link rel="preload" as="image" href="assets/characters/gomez.webp">
+<link rel="preload" as="image" href="assets/characters/fester.webp">
+<link rel="preload" as="image" href="assets/characters/pugsley.jpg">
+<link rel="preload" as="image" href="assets/characters/grandmama.webp">
+<link rel="preload" as="image" href="assets/characters/lurch.webp">
+<link rel="preload" as="image" href="assets/characters/thing.jpg">
+<link rel="preload" as="image" href="assets/characters/cousin_itt.webp">
+<link rel="preload" as="image" href="assets/characters/enid.jpg">
+<link rel="preload" as="image" href="assets/characters/xavier.jpg">
+<link rel="preload" as="image" href="assets/characters/tyler.avif">
+<link rel="preload" as="image" href="assets/characters/Bianca.webp">
+<link rel="preload" as="image" href="assets/characters/ophelia.webp">
 
-    /* quiz */
-    .progress{height:10px;background:#23233a;border-radius:999px;overflow:hidden}
-    .progress > div{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));width:0}
-    .options{display:grid;gap:10px;margin-top:12px}
-    .option{border:1px solid var(--edge);background:rgba(255,255,255,.02);padding:12px;border-radius:12px;display:flex;align-items:center;gap:12px}
-    .option input{accent-color:var(--accent2)}
+<style>
 
-    .footer{margin-top:28px;display:flex;gap:10px;flex-wrap:wrap}
-    .tag{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--edge);border-radius:999px;padding:6px 10px;color:var(--muted)}
+:root{
+  --bg:#0b0b10; --ink:#e8e8f3; --muted:#b8b8c8; --edge:#242438;
+  --accent:#8a2be2; --accent2:#00ffa6; --danger:#ff3b3b;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  /* (removed stray HTML here) */
+  margin:0; color:var(--ink);
+  font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";
+  background:var(--bg);
+  line-height:1.6;
+  overflow:hidden; /* center landing, no page scroll */
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
 
-    .pill{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;background:#1a1a28;border:1px solid var(--edge)}
+/* --- Fixed Addams portrait (always visible, gently dimmed) --- */
+body::before{
+  content:"";
+  position:fixed; inset:0;
+  background:url("assets/characters/family.webp") center 40%/cover no-repeat;
+  filter:brightness(.52) contrast(1.06) saturate(.9);
+  z-index:-5; pointer-events:none;
+}
+/* subtle vignette only (kept light so portrait shows) */
+body::after{
+  content:"";
+  position:fixed; inset:0;
+  background:
+    radial-gradient(1200px 800px at 50% 15%, rgba(0,0,0,.18), transparent 60%),
+    radial-gradient(900px 700px at 50% 120%, rgba(0,0,0,.34), transparent 60%);
+  z-index:-4; pointer-events:none;
+}
 
-    .hidden{display:none}
-    .fade{animation:fade .35s ease}
-    @keyframes fade{from{opacity:.3;transform:translateY(4px)}to{opacity:1;transform:none}}
-    a{color:var(--accent2);text-decoration:none}
-    a:hover{text-decoration:underline}
-  </style>
+/* background motion (very subtle) */
+.bg-wrap{position:fixed; inset:0; overflow:hidden; z-index:-3}
+.bg-grad{position:absolute; inset:-20%;
+  background:
+    radial-gradient(1200px 800px at 80% -10%, #161626 0, transparent 60%),
+    radial-gradient(800px 600px at -10% 110%, #1a1a2a 0, transparent 60%),
+    transparent;
+  animation: slow-pan 36s linear infinite;
+  opacity:.35;
+}
+@keyframes slow-pan{0%{transform:translate3d(0,0,0)}50%{transform:translate3d(2%,1%,0)}100%{transform:translate3d(0,0,0)}}
+
+/* ===== CENTERED LANDING ===== */
+.landing{ position:fixed; inset:0; display:grid; place-items:center; z-index:2 }
+.max{
+  max-width:1024px; width:min(1000px, 92vw);
+  padding:24px; border-radius:20px;
+  backdrop-filter:blur(6px);
+  background:linear-gradient(180deg,rgba(17,18,28,.62),rgba(17,18,28,.42));
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 18px 50px rgba(0,0,0,.45);
+}
+header{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.title{ display:flex; flex-direction:column; gap:6px; align-items:flex-start; }
+.title-main{ display:flex; gap:12px; align-items:center }
+.title h1{margin:0; line-height:1.15; font-size:clamp(1.25rem, 3.2vw, 2.1rem)}
+.badge{font-size:.8rem;padding:.25rem .6rem;border:1px solid rgba(255,255,255,.12);border-radius:999px;color:var(--muted);background:rgba(255,255,255,.02)}
+
+/* Single tagline chip (inline, NOT duplicated elsewhere) */
+.hero-tagline{
+  display:inline-flex; align-items:center; gap:10px;
+  margin:8px 0 0; padding:8px 14px;
+  border-radius:999px; border:1px solid rgba(255,255,255,.06);
+  font-size:clamp(.95rem,1.8vw,1.1rem);
+  background:linear-gradient(90deg, rgba(0,0,0,0.55), rgba(10,6,12,0.45));
+}
+.hero-tagline .caret{ width:8px; height:18px; border-radius:2px; margin-left:8px;
+  background:linear-gradient(180deg,var(--accent2),var(--accent)); }
+@keyframes caret-blink{ 0%,49%{opacity:1}50%,100%{opacity:0} }
+.hero-tagline .caret.blink{ animation: caret-blink 900ms steps(2) infinite }
+
+/* Cards / grid */
+.card{
+  background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));
+  border:1px solid rgba(255,255,255,.10);
+  backdrop-filter:blur(6px);
+  border-radius:16px; padding:16px; box-shadow:0 12px 36px rgba(0,0,0,.35)
+}
+.grid{display:grid;gap:14px}
+@media(min-width:780px){.grid-2{grid-template-columns:1fr 1fr}}
+h2{margin:.2rem 0 1rem;color:var(--muted);font-size:1.1rem}
+button{cursor:pointer;border:none;border-radius:14px;padding:12px 16px;font-weight:700}
+.btn{background:linear-gradient(180deg,var(--accent),#6120a8);color:#fff}
+.btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--edge)}
+.btn-danger{background:linear-gradient(180deg,var(--danger),#b90b1b);color:#fff}
+.small{font-size:.9rem;color:var(--muted)}
+.footer{margin-top:18px;display:flex;gap:10px;flex-wrap:wrap}
+.pill{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;background:#1a1a28;border:1px solid rgba(255,255,255,.12)}
+.hidden{display:none}
+.options{display:grid;gap:10px;margin-top:12px}
+.option{border:1px solid var(--edge);background:rgba(255,255,255,.02);padding:12px;border-radius:12px;display:flex;align-items:center;gap:12px;transition:transform .15s ease,background .2s}
+.option:hover{transform:translateY(-1px);background:rgba(255,255,255,.04)}
+.option input{accent-color:var(--accent2)}
+.progress{height:10px;background:#23233a;border-radius:999px;overflow:hidden}
+.progress>div{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));width:0}
+.portrait{width:100%;max-width:220px;aspect-ratio:1/1;border-radius:14px;object-fit:cover;border:1px solid var(--edge);background:#0f1117}
+
+/* Ambience bar */
+.music-bar{
+  position:fixed; right:16px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  z-index:50; display:flex; align-items:center; gap:8px;
+  background:#12121a;border:1px solid var(--edge);border-radius:999px;padding:8px 12px;box-shadow:0 10px 30px rgba(0,0,0,.35)
+}
+.music-bar input[type=range]{width:110px}
+
+/* Consent banner */
+.sound-consent{
+  position:fixed; left:0; right:0; top:0; z-index:60;
+  display:flex; justify-content:center; padding:10px 12px;
+  background:linear-gradient(180deg, rgba(0,0,0,.65), rgba(0,0,0,.35));
+  backdrop-filter: blur(6px);
+}
+
+/* Overlays (quiz/result) centered */
+#quiz.card, #result.card{
+  position:fixed !important;
+  top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  width:min(920px,94vw);
+  max-height:88vh;
+  overflow:auto;
+  z-index:9999;
+  border-radius:14px;
+  padding:20px;
+  box-shadow:0 20px 50px rgba(0,0,0,0.6);
+}
+
+/* Responsive */
+@media (max-width:900px){
+  .max{ width:min(780px,94vw); padding:18px }
+  .card{ padding:14px }
+  .grid.grid-2{ grid-template-columns:1fr }
+  .music-bar input[type=range]{ width:90px }
+  .badge{ display:none }
+}
+
+@media print {
+  body * { visibility: hidden; }
+  #certificate, #certificate * { visibility: visible; }
+  #certificate { position:absolute; top:1cm; left:1cm; right:1cm; border-color:#888; }
+}
+
+/* ===================== */
+/*  FOG (spooky clouds)  */
+/* ===================== */
+.fog, .fog::before, .fog::after{position:fixed;inset:-10vmax;pointer-events:none}
+.fog{z-index:0;opacity:.25;filter:blur(2px)}
+.fog::before, .fog::after{
+  content:"";
+  background:
+    radial-gradient(60vmax 40vmax at 10% 20%, rgba(255,255,255,.04), transparent 60%),
+    radial-gradient(50vmax 35vmax at 80% 10%, rgba(255,255,255,.035), transparent 60%),
+    radial-gradient(40vmax 30vmax at 40% 80%, rgba(255,255,255,.03), transparent 60%);
+  animation:drift 60s linear infinite;
+}
+.fog::after{animation-duration:85s;mix-blend-mode:screen}
+@keyframes drift{
+  from{transform:translateX(-10%) translateY(-4%)}
+  to{transform:translateX(10%) translateY(4%)}
+}
+/* webs framing */
+.web{ position:relative;overflow:hidden;border-radius:18px }
+.web::before{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(220px 140px at 8% 6%, rgba(138,43,226,.18), transparent 60%),radial-gradient(260px 150px at 92% 96%, rgba(0,255,166,.12), transparent 60%)}
+.web::after{content:"";position:absolute;inset:0;border-radius:inherit;background:repeating-conic-gradient(from 0deg, rgba(255,255,255,.05) 0 6deg, transparent 6deg 12deg);mask:radial-gradient(circle at 50% 50%, rgba(0,0,0,.85) 0 45%, transparent 55% 100%)}
+/* ===== Overlay FX (always on top of portrait) ===== */
+.fx-layer{position:fixed; inset:0; pointer-events:none; z-index:9998}
+
+/* floating clouds */
+.fx-clouds, .fx-clouds::before, .fx-clouds::after{position:absolute; inset:-8vmax}
+.fx-clouds{
+  opacity:.35; filter:blur(2px);
+  animation:fx-cloud-pop 200ms ease-out forwards;
+}
+.fx-clouds::before, .fx-clouds::after{
+  content:"";
+  background:
+    radial-gradient(50vmax 35vmax at 15% 20%, rgba(255,255,255,.14), transparent 62%),
+    radial-gradient(60vmax 40vmax at 85% 10%, rgba(255,255,255,.12), transparent 62%),
+    radial-gradient(40vmax 30vmax at 50% 80%, rgba(255,255,255,.10), transparent 62%);
+  animation:fx-cloud-drift 70s linear infinite;
+  mix-blend-mode:screen;
+}
+.fx-clouds::after{ animation-duration:100s; opacity:.9 }
+
+@keyframes fx-cloud-pop{from{opacity:0; transform:scale(.98)} to{opacity:.35; transform:scale(1)}}
+@keyframes fx-cloud-drift{
+  from{ transform:translateX(-6%) translateY(-3%) }
+  to{   transform:translateX( 6%) translateY( 3%) }
+}
+
+/* bats */
+.fx-bats{position:absolute; inset:0; overflow:visible}
+.bat{
+  position:absolute; width:72px; height:28px; opacity:0;
+  will-change:transform,opacity;
+  filter:drop-shadow(0 2px 2px rgba(0,0,0,.55));
+}
+.bat.fly{
+  opacity:1;
+  animation:fx-bat-fly 6s linear forwards;
+}
+
+@keyframes fx-bat-fly{
+  0%   { transform:translate(var(--x0),var(--y0)) rotate(var(--r0)) scale(var(--s)) }
+  40%  { transform:translate(var(--x1),var(--y1)) rotate(var(--r1)) scale(var(--s)) }
+  100% { transform:translate(var(--x2),var(--y2)) rotate(var(--r2)) scale(var(--s)); opacity:0 }
+}
+/* floating mini-clouds (individual drifting blobs) */
+.cloud {
+  position: absolute;
+  width: 120px;
+  height: 60px;
+  opacity: 0;
+  filter: blur(4px);
+  will-change: transform, opacity;
+}
+.cloud.fly {
+  opacity: 0.5;
+  animation: cloud-fly 40s linear forwards;
+}
+
+@keyframes cloud-fly {
+  0%   { transform: translate(var(--x0), var(--y0)) scale(var(--s)); opacity: 0; }
+  5%   { opacity: 0.6; }
+  90%  { opacity: 0.6; }
+  100% { transform: translate(var(--x2), var(--y2)) scale(var(--s)); opacity: 0; }
+}
+/* ===== Hanging spiders ===== */
+.spider {
+  position: absolute;
+  top: 0;
+  width: 40px;
+  height: 80px;
+  transform-origin: top center;
+  opacity: 0;
+  animation: spider-drop 2s ease-out forwards, spider-sway 3s ease-in-out infinite alternate;
+}
+
+.spider-line {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 1px;
+  height: 60px;
+  background: rgba(255,255,255,0.4);
+  transform: translateX(-50%);
+}
+
+.spider-body {
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  width: 18px;
+  height: 22px;
+  border-radius: 50%;
+  background: #111;
+  transform: translateX(-50%);
+  box-shadow: inset 0 0 4px rgba(255,255,255,0.2);
+}
+/* ——— Spider legs ——— */
+.spider-body {
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  width: 18px;
+  height: 22px;
+  border-radius: 50%;
+  background: #111;
+  transform: translateX(-50%);
+  box-shadow: inset 0 0 4px rgba(255,255,255,0.18);
+}
+
+/* shared leg style */
+.spider-body .leg{
+  position:absolute;
+  left:50%;
+  width:18px; height:2px;
+  background:#0c0c0c;
+  border-radius:2px;
+  transform-origin:0 50%;
+  /* tiny highlight so legs aren’t invisible on dark bg */
+  box-shadow: inset 0 0 1px rgba(255,255,255,.2);
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,.4));
+}
+
+/* two-segment look: each leg has a little “knee” */
+.spider-body .leg::after{
+  content:"";
+  position:absolute;
+  left:12px; top:-1px;
+  width:12px; height:2px;
+  background:#0c0c0c;
+  border-radius:2px;
+  transform-origin:0 50%;
+  transform: rotate(var(--knee, 28deg));
+}
+
+/* Left legs (1–4) */
+.spider-body .leg.left.l1{ top:6px;  transform: translateX(-50%) rotate(-42deg) }
+.spider-body .leg.left.l2{ top:10px; transform: translateX(-50%) rotate(-20deg) }
+.spider-body .leg.left.l3{ top:14px; transform: translateX(-50%) rotate(-4deg)  }
+.spider-body .leg.left.l4{ top:18px; transform: translateX(-50%) rotate(14deg)  }
+
+/* Right legs (1–4) — mirrored */
+.spider-body .leg.right.l1{ top:6px;  transform: translateX(-50%) scaleX(-1) rotate(-42deg) }
+.spider-body .leg.right.l2{ top:10px; transform: translateX(-50%) scaleX(-1) rotate(-20deg) }
+.spider-body .leg.right.l3{ top:14px; transform: translateX(-50%) scaleX(-1) rotate(-4deg)  }
+.spider-body .leg.right.l4{ top:18px; transform: translateX(-50%) scaleX(-1) rotate(14deg)  }
+
+/* optional subtle sway for legs with the spider */
+.spider { transform-origin: top center }
+
+@keyframes spider-drop {
+  0%   { transform: translateY(-100px) scaleY(0.6); opacity: 0; }
+  50%  { opacity: 1; }
+  100% { transform: translateY(0) scaleY(1); opacity: 1; }
+}
+
+@keyframes spider-sway {
+  from { transform: rotate(-5deg) translateX(-2px); }
+  to   { transform: rotate(5deg) translateX(2px); }
+}
+
+</style>
 </head>
 <body>
+<div class="fog" aria-hidden="true"></div>
+<div class="bats" id="bats" aria-hidden="true"></div>
+
+<!-- Spooky moving clouds (no JS) -->
+<div class="spooky-clouds" aria-hidden="true">
+  <span class="cloud c1"></span>
+  <span class="cloud c2"></span>
+  <span class="cloud c3"></span>
+  <span class="cloud c4"></span>
+  <span class="cloud c5"></span>
+</div>
+
+<!-- subtle motion layer -->
+<div class="bg-wrap" aria-hidden="true"><div class="bg-grad"></div></div>
+
+<!-- Consent -->
+<div id="soundConsent" class="sound-consent" aria-hidden="false">
+  <div class="card" style="max-width:720px; width:100%;">
+    <div style="display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap">
+      <div>
+        <div style="font-size:1.05rem;margin-bottom:2px">Enable ambience</div>
+        <div class="small">Click to enable spooky ambience music (some browsers require a user action).</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button id="enableSoundBtn" class="btn">Enable ambience</button>
+        <button id="dismissSoundBtn" class="btn-ghost">No thanks</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CENTERED LANDING ===== -->
+<section class="landing">
   <div class="max">
     <header>
       <div class="title">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 2c-1.5 0-3 .6-4.2 1.8C6.6 5 6 6.5 6 8v2H4l2 4v6h12v-6l2-4h-2V8c0-1.5-.6-3-1.8-4.2C15 2.6 13.5 2 12 2Z" stroke="currentColor" stroke-width="1.25"/><path d="M9 10c0-1.657 1.343-3 3-3s3 1.343 3 3" stroke="currentColor" stroke-width="1.25"/></svg>
-        <h1>Which Addams Are You? — Halloween Quiz</h1>
+        <div class="title-main">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2c-1.5 0-3 .6-4.2 1.8C6.6 5 6 6.5 6 8v2H4l2 4v6h12v-6l2-4h-2V8c0-1.5-.6-3-1.8-4.2C15 2.6 13.5 2 12 2Z" stroke="currentColor" stroke-width="1.25"/><path d="M9 10c0-1.657 1.343-3 3-3s3 1.343 3 3" stroke="currentColor" stroke-width="1.25"/></svg>
+          <h1>Addams Family — Halloween Quiz</h1>
+        </div>
+        <!-- Tagline immediately below the title -->
+        <div id="subtitle" class="hero-tagline" aria-hidden="true">Welcome, mortal…</div>
       </div>
-      <span class="badge">Single‑file • GitHub Pages ready</span>
+
     </header>
 
-    <section class="grid grid-cols-2" id="setup">
-      <div class="card web fade">
-        <h2>Party mode (no repeats)</h2>
-        <p class="muted">Up to 14 players can take the quiz one‑by‑one. Each character is assigned only once. Perfect for a Halloween get‑together 👻</p>
-        <form id="playersForm" class="grid" autocomplete="off">
+    <section class="grid grid-2" id="setup">
+      <div class="card">
+        <h2>Welcome, mortal…</h2>
+        <p class="small">
+Step into the Addams manor, where shadows whisper and portraits stare back.
+Dare to reveal which peculiar soul you truly are — one omen per mortal, per event.
+</p>
+        <form id="nameForm" class="grid" autocomplete="off">
           <label>
-            <span class="small muted">How many players?</span>
-            <input id="playerCount" type="number" min="1" max="14" value="1" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--edge);background:#111320;color:var(--ink)" />
+            <span class="small">Your name</span>
+            <input id="playerName" type="text" placeholder="e.g., Wednesday Addams" required style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--edge);background:#111320;color:var(--ink)">
           </label>
-          <div id="playerNames" class="grid"></div>
-          <div>
-            <button class="btn" type="submit">Start the quiz</button>
-            <button class="btn-ghost" type="button" id="fillSample">Fill sample names</button>
-          </div>
+          <div><button class="btn" id="startBtn" type="submit">Unlock my omen</button></div>
         </form>
       </div>
-      <div class="card fade">
-        <h2>About</h2>
-        <p>This is a lightweight site with zero dependencies. Just drop this file into a GitHub repo as <code>index.html</code> and enable GitHub Pages. Works great on mobile.</p>
-        <div class="footer">
-          <span class="pill">🎃 Halloween theme</span>
-          <span class="pill">🪄 Personality quiz</span>
-          <span class="pill">🔒 No repeats across players</span>
-          <span class="pill">🌓 Dark‑mode only (spooky!)</span>
-        </div>
+
+      <div class="card">
+        <h2>About the Ritual</h2>
+<p class="small">
+Each brave soul who enters the manor is bound to a single Addams spirit —
+your kindred creature of darkness, chosen by fate (and a few eccentric algorithms).
+No two mortals may claim the same identity under one event’s moon.
+</p>
+<ul class="small" style="margin:0;padding-left:18px">
+  <li>Summon your kin by sharing the same event code — one spirit per mortal.</li>
+  <li>Collect your portrait and certificate to prove your eerie lineage.</li>
+  <li>Use them wisely... the Addams family is always watching.</li>
+</ul>
+
+        </ul>
       </div>
     </section>
 
-    <section id="quiz" class="card hidden fade" aria-live="polite"></section>
-
-    <section id="result" class="card hidden fade" aria-live="polite"></section>
-
-    <section id="roster" class="card hidden fade"></section>
-
-    <footer class="center" style="margin:28px 0 12px">
-      <p class="small muted">Built for fans; this is an homage. Character names are trademarks of their respective owners.</p>
+    <footer class="small" style="text-align:center;margin:12px 0 0;color:#9aa">
+      Rewired for fun!!
     </footer>
   </div>
+</section>
+
+<!-- Overlays -->
+<section id="quiz" class="card hidden" aria-live="polite"></section>
+<section id="result" class="card hidden" aria-live="polite"></section>
+
+<!-- Printable certificate -->
+<section id="printArea" class="hidden">
+  <div id="certificate" style="max-width:900px;margin:0 auto;border:2px solid #555;border-radius:18px;background:#101116;padding:28px">
+    <div class="row" style="display:flex;gap:18px;align-items:flex-start">
+      <div class="left" style="flex:0 0 220px">
+        <img id="certImg" class="portrait" alt="Character portrait" src="">
+      </div>
+      <div class="right" style="flex:1">
+        <h1 id="certTitle">Certificate of Addams Kinship</h1>
+        <h2 id="certWho"></h2>
+        <div id="certName" style="font-size:1.4rem;margin-bottom:10px"></div>
+        <div><strong>Traits</strong></div>
+        <ul id="certTraits"></ul>
+        <blockquote id="certQuote" style="margin-top:14px;opacity:.9"></blockquote>
+        <footer>Halloween Quiz • <span id="certEvent">default</span></footer>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Ambience controls -->
+<div class="music-bar" role="group" aria-label="Background music controls">
+  <div id="yt-mount" style="width:0;height:0;overflow:hidden"></div>
+  <button class="btn-ghost" id="ytToggle" type="button">▶ Play ambience</button>
+  <label class="small" for="ytVol">Vol</label>
+  <input id="ytVol" type="range" min="0" max="100" value="28" />
+  <!-- allow pasting a YouTube URL/ID -->
+  <!-- status (visible for debugging) -->
+  <div id="audioStatus" style="margin-left:8px;font-size:0.85rem;color:#cbd5ff;opacity:.9">idle</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.46.1/dist/umd/supabase.min.js"></script>
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
+// ===== Overlay FX bootstrap (clouds + bats) =====
+(function(){
+  // Create top overlay (above portrait/bg, below #quiz/#result)
+  const layer = document.createElement('div');
+  layer.className = 'fx-layer';
+  const clouds = document.createElement('div');
+  clouds.className = 'fx-clouds';
+  const batsWrap = document.createElement('div');
+  batsWrap.className = 'fx-bats';
+  layer.append(clouds, batsWrap);
+  document.body.appendChild(layer);
+
+  // SVG bat maker (no external files)
+  function createBatSVG(){
+    const svgNS='http://www.w3.org/2000/svg';
+    const svg=document.createElementNS(svgNS,'svg');
+    svg.setAttribute('viewBox','0 0 60 26');
+    svg.setAttribute('width','60');
+    svg.setAttribute('height','26');
+    const path=document.createElementNS(svgNS,'path');
+    path.setAttribute('fill','black');
+    path.setAttribute('d','M30 10c4-8 9-9 15-9-4 2-3 6 0 8 3-2 7-2 13-1-6 3-8 8-7 12-4-2-8-3-12-2-2 6-8 6-10 0-4-1-8 0-12 2 1-4-1-9-7-12 6-1 10-1 13 1 3-2 4-6 0-8 6 0 11 1 15 9z');
+    svg.appendChild(path);
+    return svg;
+  }
+
+  function spawnBats(count = 10){
+    const W = window.innerWidth, H = window.innerHeight;
+    for(let i=0;i<count;i++){
+      const d = document.createElement('div');
+      d.className = 'bat fly';
+      const svg = createBatSVG();
+      svg.style.width = '42px'; svg.style.height = '18px';
+      d.appendChild(svg);
+
+      const s  = 0.8 + Math.random()*0.8;             // scale
+      const x0 = -80 - Math.random()*120;
+      const y0 = Math.random()*H*0.9;
+      const x2 = W + 100 + Math.random()*160;
+      const y2 = Math.random()*H*0.95;
+      const x1 = (x0+x2)/2 + (Math.random()*260-130); // bezier-ish midpoint
+      const y1 = (y0+y2)/2 + (Math.random()*160-80);
+      const r0 = (Math.random()*30-15)+'deg';
+      const r1 = (Math.random()*40-20)+'deg';
+      const r2 = (Math.random()*30-15)+'deg';
+
+      d.style.setProperty('--s',  s);
+      d.style.setProperty('--x0', x0+'px');
+      d.style.setProperty('--y0', y0+'px');
+      d.style.setProperty('--x1', x1+'px');
+      d.style.setProperty('--y1', y1+'px');
+      d.style.setProperty('--x2', x2+'px');
+      d.style.setProperty('--y2', y2+'px');
+      d.style.setProperty('--r0', r0);
+      d.style.setProperty('--r1', r1);
+      d.style.setProperty('--r2', r2);
+      d.style.animationDelay = (Math.random()*900)+'ms';
+
+      batsWrap.appendChild(d);
+      // clean up each bat after it finishes
+      setTimeout(()=> d.remove(), 6500);
+    }
+  }
+
+  // keep a calm ambience: clouds always present; bats fly now and then
+  // (doesn't interfere with your existing app code)
+  let batTimer = null;
+  function scheduleBats(){
+    // between 7–16 seconds between waves
+    const next = 7000 + Math.random()*9000;
+    batTimer = setTimeout(()=>{
+      spawnBats(6 + Math.floor(Math.random()*6));
+      scheduleBats();
+    }, next);
+  }
+  scheduleBats();
+
+  // if you want to manually trigger: window.spawnBats(12)
+  window.spawnBats = spawnBats;
+})();
+
+function spawnClouds(count = 5){
+  const W = window.innerWidth, H = window.innerHeight;
+  for(let i = 0; i < count; i++){
+    const d = document.createElement('div');
+    d.className = 'cloud fly';
+
+    // Create small white cloud SVG (soft edges)
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('viewBox', '0 0 100 60');
+    svg.setAttribute('width', '100');
+    svg.setAttribute('height', '60');
+    const cloudPath = document.createElementNS(svgNS, 'path');
+    cloudPath.setAttribute('fill', 'white');
+    cloudPath.setAttribute('opacity', '0.6');
+    cloudPath.setAttribute(
+      'd',
+      'M20 35a15 15 0 0 1 30-5 15 15 0 0 1 20-5 15 15 0 0 1 10 10 15 15 0 0 1-15 15H25a10 10 0 0 1-5-15z'
+    );
+    svg.appendChild(cloudPath);
+    d.appendChild(svg);
+
+    const s  = 0.6 + Math.random() * 0.8;
+    const x0 = -150 - Math.random() * 200;
+    const y0 = Math.random() * H * 0.6;
+    const x2 = W + 200 + Math.random() * 200;
+    const y2 = y0 + Math.random() * 60 - 30;
+    d.style.setProperty('--x0', x0 + 'px');
+    d.style.setProperty('--y0', y0 + 'px');
+    d.style.setProperty('--x2', x2 + 'px');
+    d.style.setProperty('--y2', y2 + 'px');
+    d.style.setProperty('--s', s);
+    d.style.animationDelay = Math.random() * 8000 + 'ms';
+
+    document.querySelector('.fx-bats')?.appendChild(d); // reuse same overlay layer
+    setTimeout(() => d.remove(), 42000); // clean after it’s gone
+  }
+}
+
+// trigger some clouds at intervals
+setInterval(() => spawnClouds(3 + Math.floor(Math.random() * 3)), 20000);
+
+// if you want to trigger manually: window.spawnClouds(6)
+window.spawnClouds = spawnClouds;
+function spawnSpiders(count = 4) {
+  const layer = document.querySelector('.fx-layer') || document.body;
+  const W = window.innerWidth;
+
+  for (let i = 0; i < count; i++) {
+    const spider = document.createElement('div');
+    spider.className = 'spider';
+    spider.style.left = Math.random() * W + 'px';
+    spider.style.animationDelay = (Math.random() * 3) + 's';
+
+    // thread + body
+    const line = document.createElement('div');
+    line.className = 'spider-line';
+    const body = document.createElement('div');
+    body.className = 'spider-body';
+    spider.append(line, body);
+    const mk = (side, n) => {
+      const el = document.createElement('span');
+      el.className = `leg ${side} l${n}`;
+      // tiny randomization for “alive” feel
+      el.style.setProperty('--knee', (26 + Math.random()*8) + 'deg');
+      return el;
+    };
+    body.append(
+      mk('left',1), mk('left',2), mk('left',3), mk('left',4),
+      mk('right',1), mk('right',2), mk('right',3), mk('right',4)
+    );
+
+    spider.append(line, body);
+    layer.appendChild(spider);
+
+    // remove after a while to prevent buildup
+    setTimeout(() => spider.remove(), 30000);
+  }
+}
+
+// spawn some initially and then occasionally
+window.addEventListener('load', () => {
+  spawnSpiders(3);
+  setInterval(() => spawnSpiders(1 + Math.floor(Math.random() * 2)), 25000);
+});
+
+// you can also call manually: window.spawnSpiders(5)
+
+</script>
 
 <script>
-/*************************
- * Data: Characters (14) *
- *************************/
-const CHARACTERS = [
-  { id:"gomez", name:"Gomez Addams",      blurb:"A flamboyant romantic with a saber and a smile.", tags:{leader:2, romantic:3, flamboyant:3, eccentric:2} },
-  { id:"morticia", name:"Morticia Addams", blurb:"Elegance, roses without the roses, serene and witchy.", tags:{elegant:3, witchy:2, leader:1} },
-  { id:"wednesday", name:"Wednesday Addams", blurb:"Deadpan, clever, and delightfully morbid.", tags:{deadpan:3, mischief:2, chaotic:1} },
-  { id:"pugsley", name:"Pugsley Addams",    blurb:"Cheerful chaos and contraptions galore.", tags:{mischief:3, chaotic:2, cute:1} },
-  { id:"fester", name:"Uncle Fester",       blurb:"Explosive ideas and a heart of (slightly charred) gold.", tags:{mad_scientist:3, eccentric:2, chaotic:1} },
-  { id:"grandmama", name:"Grandmama",       blurb:"Potions, fortunes, and a cackle for the ages.", tags:{witchy:3, eccentric:2} },
-  { id:"lurch", name:"Lurch",               blurb:"You rang? Stoic, loyal, unexpectedly musical.", tags:{loyal:3, handy:1, leader:1} },
-  { id:"thing", name:"Thing",               blurb:"A helping hand—literally—swift and loyal.", tags:{handy:3, loyal:2, mischief:1} },
-  { id:"cousin_itt", name:"Cousin Itt",     blurb:"Fast talk, faster cars, and impeccable style.", tags:{flamboyant:3, socialite:2, eccentric:1} },
-  { id:"pubert", name:"Pubert Addams",      blurb:"The tiniest agent of adorable pandemonium.", tags:{cute:3, chaotic:2} },
-  { id:"ophelia", name:"Ophelia Frump",     blurb:"Hopeless romantic with a flower crown.", tags:{romantic:2, elegant:1, socialite:1} },
-  { id:"debbie", name:"Debbie Jellinsky",   blurb:"Glam, charm, and the sharpest side‑eye.", tags:{socialite:3, flamboyant:1, elegant:1} },
-  { id:"abigail", name:"Abigail Craven",     blurb:"Schemes, secrets, and scientific flair.", tags:{mad_scientist:2, socialite:1} },
-  { id:"margaret", name:"Margaret Alford",  blurb:"Prim, proper, and delightfully susceptible to the macabre.", tags:{socialite:2, elegant:2} },
-];
+/* ===== CONFIG ===== */
+// Accept either a raw YouTube video ID (11 chars) or a full URL. If someone saved a full
+// "https://www.youtube.com/watch?v=..." link in the config, extract the ID so the
+// iframe API receives a valid videoId.
+function extractYouTubeID(input){
+  if(!input) return "";
+  try{
+    const u = new URL(input);
+    const host = u.hostname.replace('www.','');
+    if(host === 'youtu.be') return u.pathname.slice(1);
+    if(host.endsWith('youtube.com')){
+      const v = u.searchParams.get('v'); if(v) return v;
+      const seg = u.pathname.split('/').pop(); if(seg && seg.length===11) return seg;
+    }
+  }catch(e){ /* not a URL, fall through */ }
+  const m = String(input).match(/([A-Za-z0-9_-]{11})/);
+  return m ? m[1] : input;
+}
+let YT_VIDEO_ID = extractYouTubeID(localStorage.getItem('afq_yt') || "zOYpduX68js");
 
-/************************
- * Data: Quiz Questions  *
- ************************/
-const QUESTIONS = [
-  { q:"Pick your ideal spooky soirée:", opts:[
-    {t:"Moonlit fencing duel", tag:"flamboyant"},
-    {t:"Midnight tea in the conservatory", tag:"elegant"},
-    {t:"Build a mysterious contraption", tag:"mad_scientist"},
-    {t:"Plot (harmless?) pranks with siblings", tag:"mischief"}
-  ]},
-  { q:"Your communication style:", opts:[
-    {t:"Deadpan one‑liners", tag:"deadpan"},
-    {t:"Grand romantic speeches", tag:"romantic"},
-    {t:"Short, efficient, helpful", tag:"handy"},
-    {t:"Grunts… but heartfelt", tag:"loyal"}
-  ]},
-  { q:"Choose a pet project:", opts:[
-    {t:"Cultivate carnivorous plants", tag:"witchy"},
-    {t:"Tune the harpsichord", tag:"elegant"},
-    {t:"Souped‑up micro‑car mods", tag:"flamboyant"},
-    {t:"Boom‑but‑safe experiments", tag:"mad_scientist"}
-  ]},
-  { q:"Your vibe at a family reunion:", opts:[
-    {t:"Leader of the games", tag:"leader"},
-    {t:"Quiet observer with a smirk", tag:"deadpan"},
-    {t:"Social butterfly", tag:"socialite"},
-    {t:"Cause cute chaos", tag:"cute"}
-  ]},
-  { q:"Preferred tool:", opts:[
-    {t:"Saber (for fun)", tag:"flamboyant"},
-    {t:"Crystal ball", tag:"witchy"},
-    {t:"Wrench (and a good scuttle)", tag:"handy"},
-    {t:"Lightning coil", tag:"mad_scientist"}
-  ]},
-  { q:"Pick a motto:", opts:[
-    {t:"Carpe noctem!", tag:"eccentric"},
-    {t:"Sic gorgiamus allos subjectatos nunc", tag:"leader"},
-    {t:"Silence speaks volumes", tag:"deadpan"},
-    {t:"If it goes boom, we zoom", tag:"chaotic"}
-  ]},
-  { q:"Go‑to outfit detail:", opts:[
-    {t:"Pinstripes & panache", tag:"flamboyant"},
-    {t:"Floor‑length glam", tag:"elegant"},
-    {t:"Something practical for crawling", tag:"handy"},
-    {t:"Whatever hides soot marks", tag:"chaotic"}
-  ]},
-  { q:"Your helper energy:", opts:[
-    {t:"Always there at a moment’s notice", tag:"loyal"},
-    {t:"Advice, potions, and snacks", tag:"witchy"},
-    {t:"Emotional support sword", tag:"romantic"},
-    {t:"Prank partner", tag:"mischief"}
-  ]}
-];
+/* Optional shared pool */
+const SUPABASE_URL=""; const SUPABASE_ANON=""; let supabaseClient=null;
+if(SUPABASE_URL && SUPABASE_ANON) supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-/****************
- * State & Util *
- ****************/
-let game = {
-  players: [],          // [{name, answers:[], scores:{tag:count}, character:null}]
-  remaining: new Set(CHARACTERS.map(c=>c.id)),
-  currentIndex: 0,
-};
+/* ===== Copy ===== */
+const TAGLINES=["please scream responsibly.","spook now, ask questions never.","100% handmade by Thing.","where normal goes to die (politely).","macabre, but make it cozy.","gothic vibes, zero jump scares.","enter if you dare… to be fabulous.","we put the fun in funeral chic.","grave expectations. delightful results.","bring your own cackle.","licensed to chill.","fangs for stopping by.","haunted by good taste.","you rang? your quiz awaits.","mood: eternal night, partial sarcasm."];
+const CERT_TITLES=["Certificate of Distinguished Eeriness","Official Addams Affiliation Parchment","By Order of the Ominous Court","This Certifies a Delightfully Abnormal Soul","Recognized Practitioner of Elegant Gloom","Licensed Bringer of Tasteful Chaos"];
+const QUIZ_QUIPS=["consulting the crystal wi-fi…","oiling the iron maiden (for squeaks)…","feeding the carnivorous ficus…","counting bats (they keep moving)…","starching the mourning clothes…","polishing the harpsichord…","warming up the cackle…"];
+const ONE_LINERS={wednesday:"smiles are for emergencies.",morticia:"calm as a closed coffin.",gomez:"panache levels: unsafe.",fester:"ideas so bright, they explode.",pugsley:"if it sparks, it’s working.",grandmama:"seasoned to perfection (mainly eye of newt).",lurch:"answers to ‘you rang?’ and nothing else.",thing:"gives five stars. literally.",cousin_itt:"hair today, chaos tomorrow.",enid:"sparkles in the dark.",xavier:"brooding creatively since forever.",tyler:"nice barista, suspicious night life.",bianca:"charisma with a current.",ophelia:"floral, fatal, and faintly dramatic."};
 
-const $ = sel => document.querySelector(sel);
-const $$ = sel => Array.from(document.querySelectorAll(sel));
+/* ===== Tagline typewriter ===== */
+(function(){
+  const el=document.getElementById('subtitle'); if(!el) return;
+  el.innerHTML=''; const icon=document.createElement('span'); icon.textContent='🎃';
+  const text=document.createElement('span'); text.className='tag-text';
+  const caret=document.createElement('span'); caret.className='caret blink';
+  el.append(icon,text,caret);
+  let idx=Math.floor(Math.random()*TAGLINES.length), chars=0, current='', mode='type', tm=null;
+  const type=()=>{ if(mode!=='type') return; text.textContent=current.slice(0,++chars);
+    if(chars>=current.length){ clearInterval(tm); setTimeout(()=>{ mode='del'; tm=setInterval(del, 28+Math.random()*40); }, 1100+Math.random()*1200);}
+  };
+  const del=()=>{ if(mode!=='del') return; text.textContent=current.slice(0,--chars);
+    if(chars<=0){ clearInterval(tm); idx=(idx+1)%TAGLINES.length; setTimeout(start, 300+Math.random()*700); }
+  };
+  function start(){ current=TAGLINES[idx]; chars=0; mode='type'; tm=setInterval(type, 34+Math.random()*44); }
+  setTimeout(start, 400+Math.random()*700);
+})();
 
-function renderNameInputs(count){
-  const wrap = document.getElementById('playerNames');
-  wrap.innerHTML = '';
-  for(let i=0;i<count;i++){
-    const lab = document.createElement('label');
-    lab.innerHTML = `<span class="small muted">Player ${i+1} name</span>
-    <input type="text" name="p${i}" placeholder="e.g., Wednesday" required style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--edge);background:#111320;color:var(--ink)" />`;
-    wrap.appendChild(lab);
+/* ===== Characters / Questions ===== */
+const CHARACTERS=[{id:"wednesday",name:"Wednesday Addams",sig:"deadpan",blurb:"Deadpan, clever, and delightfully morbid.",tags:{deadpan:3,mischief:2,chaotic:1},img:"assets/characters/wednesday.webp",traits:["Deadpan wit","Independent","Macabre sense of humor"],quote:"Be afraid. Be very afraid."},{id:"morticia",name:"Morticia Addams",sig:"elegant",blurb:"Elegance and serenity in shadows.",tags:{elegant:3,witchy:2,leader:1},img:"assets/characters/morticia.jpg",traits:["Elegant","Mysterious","Unflappable"],quote:"Normal is an illusion."},{id:"gomez",name:"Gomez Addams",sig:"flamboyant",blurb:"Flair, fencing, and fierce romance.",tags:{leader:2,romantic:3,flamboyant:3,eccentric:2},img:"assets/characters/gomez.webp",traits:["Passionate","Charming","Dramatic"],quote:"To live without you? Only in the grave."},{id:"fester",name:"Uncle Fester",sig:"mad_scientist",blurb:"Explosive ideas and a spark of joy.",tags:{mad_scientist:3,eccentric:2,chaotic:1},img:"assets/characters/fester.webp",traits:["Inventive","Zany","Electric"],quote:"I’m an ideas man."},{id:"pugsley",name:"Pugsley Addams",sig:"mischief",blurb:"Cheerful chaos & contraptions.",tags:{mischief:3,chaotic:2,cute:1},img:"assets/characters/pugsley.jpg",traits:["Playful","Curious","Mischievous"],quote:"Can we make it explode?"},{id:"grandmama",name:"Grandmama Addams",sig:"witchy",blurb:"Potions, fortunes, and wild cackles.",tags:{witchy:3,eccentric:2},img:"assets/characters/grandmama.webp",traits:["Witchy","Wild","Resourceful"],quote:"Double, double… cackle and trouble!"},{id:"lurch",name:"Lurch",sig:"loyal",blurb:"You rang? Stoic and steadfast.",tags:{loyal:3,handy:1,leader:1},img:"assets/characters/lurch.webp",traits:["Loyal","Stoic","Towering"],quote:"...You rang?"},{id:"thing",name:"Thing",sig:"handy",blurb:"A helping hand—literally.",tags:{handy:3,loyal:2,mischief:1},img:"assets/characters/thing.jpg",traits:["Helpful","Quick","Resourceful"],quote:"Always lending a hand."},{id:"cousin_itt",name:"Cousin Itt",sig:"flamboyant",blurb:"Fast talk, faster fashion.",tags:{flamboyant:3,socialite:2,eccentric:1},img:"assets/characters/cousin_itt.webp",traits:["Eccentric","Fashionable","Chatty"],quote:"*indistinct chatter*"},{id:"enid",name:"Enid Sinclair",sig:"loyal",blurb:"Colorful, loyal, and full of heart.",tags:{loyal:3,socialite:2,cute:1,flamboyant:1},img:"assets/characters/enid.jpg",traits:["Cheerful","Loyal","Colorful"],quote:"We werewolves stick together."},{id:"xavier",name:"Xavier Thorpe",sig:"artistic",blurb:"Brooding artist with living sketches.",tags:{artistic:3,romantic:1,eccentric:1},img:"assets/characters/xavier.jpg",traits:["Artistic","Brooding","Imaginative"],quote:"Art is my alibi."},{id:"tyler",name:"Tyler Galpin",sig:"intense",blurb:"Sweet barista… with a Hyde inside.",tags:{intense:2,passionate:1,leader:1},img:"assets/characters/tyler.avif",traits:["Dual-natured","Passionate","Intense"],quote:"Everyone hides something."},{id:"bianca",name:"Bianca Barclay",sig:"socialite",blurb:"Magnetic siren queen with razor-sharp poise.",tags:{socialite:3,elegant:1,leader:1},img:"assets/characters/Bianca.webp",traits:["Confident","Alluring","Strategic"],quote:"Power is knowing when to speak — and when to be heard."},{id:"ophelia",name:"Ophelia Frump",sig:"romantic",blurb:"Flower-crowned dreamer.",tags:{romantic:2,elegant:1,socialite:1},img:"assets/characters/ophelia.webp",traits:["Romantic","Dreamy","Gentle"],quote:"The heart writes poetry."}];
+const CHAR_BY_ID=Object.fromEntries(CHARACTERS.map(c=>[c.id,c]));
+const Q=[{q:"Pick your ideal spooky soirée:",o:[["Moonlit fencing duel","flamboyant"],["Midnight tea in the conservatory","elegant"],["Build a mysterious contraption","mad_scientist"],["Plot (harmless?) pranks","mischief"]]},
+{q:"Your communication style:",o:[["Deadpan one-liners","deadpan"],["Grand romantic speeches","romantic"],["Short, efficient, helpful","handy"],["Grunts… but heartfelt","loyal"]]},
+{q:"Choose a pet project:",o:[["Carnivorous plants","witchy"],["Tune the harpsichord","elegant"],["Souped-up micro-car mods","flamboyant"],["Boom-but-safe experiments","mad_scientist"]]},
+{q:"Your vibe at a reunion:",o:[["Leader of the games","leader"],["Quiet observer with a smirk","deadpan"],["Social butterfly","socialite"],["Cause cute chaos","cute"]]},
+{q:"Preferred tool:",o:[["Saber (for fun)","flamboyant"],["Crystal ball","witchy"],["Wrench (and a good scuttle)","handy"],["Lightning coil","mad_scientist"]]},
+{q:"Pick a motto:",o:[["Carpe noctem!","eccentric"],["Sic gorgiamus allos subjectatos nunc","leader"],["Silence speaks volumes","deadpan"],["If it goes boom, we zoom","chaotic"]]},
+{q:"Go-to outfit detail:",o:[["Pinstripes & panache","flamboyant"],["Floor-length glam","elegant"],["Something practical for crawling","handy"],["Whatever hides soot marks","chaotic"]]},
+{q:"Your helper energy:",o:[["Always there in a pinch","loyal"],["Advice, potions, snacks","witchy"],["Emotional support sword","romantic"],["Prank partner","mischief"]]},
+{q:"Pick a haunt:",o:[["Dusty library","deadpan"],["Velvet lounge","elegant"],["Grand hall","leader"],["Basement lab","mad_scientist"]]},
+{q:"Signature phrase:",o:[["(stares silently)","deadpan"],["Darling…","romantic"],["How… exquisite.","elegant"],["I have an idea!","mad_scientist"]]},
+{q:"Snack time:",o:[["Licorice","deadpan"],["Dark truffles","elegant"],["Spicy tapas","flamboyant"],["Pop rocks","chaotic"]]},
+{q:"Meeting style:",o:[["One-liners only","deadpan"],["Grand speeches","leader"],["Elegant summaries","elegant"],["Live demo (with sparks)","mad_scientist"]]},
+{q:"Ride of choice:",o:[["Hearse","deadpan"],["Classic roadster","flamboyant"],["Limousine","elegant"],["Sidecar with weird gadgets","mad_scientist"]]},
+{q:"Music you vibe with:",o:[["Baroque organ","elegant"],["Surf rock (spooky!)","flamboyant"],["Industrial clanks","mad_scientist"],["Minimal ambient","deadpan"]]},
+{q:"Power move:",o:[["Fashionably late entrance","socialite"],["Deadpan stare-down","deadpan"],["Fix it before they notice","handy"],["Light up the room","chaotic"]]},
+{q:"Best compliment:",o:[["Your poise is unreal","elegant"],["You light up the room","flamboyant"],["You always show up","loyal"],["You’re… unsettling (in a good way)","eccentric"]]},
+{q:"Totem animal:",o:[["Raven","deadpan"],["Black cat","elegant"],["Wolf","loyal"],["Electric eel","mad_scientist"]]},
+{q:"Hidden hobby:",o:[["Pressed flowers","romantic"],["Whittling tiny hands","handy"],["Secret graffiti","artistic"],["People-watching","socialite"]]}];
+
+/* ===== Landing -> Quiz ===== */
+const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+const params=new URLSearchParams(location.search);
+let EVENT=(params.get("event")||"default").trim().slice(0,32)||"default";
+const LS_KEY=k=>`afq_${EVENT}_${k}`;
+$("#nameForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const n=$("#playerName").value.trim(); if(!n) return;
+  startQuiz(n);
+});
+
+/* ===== Ambience ===== */
+const soundConsent=$("#soundConsent");
+const enableSoundBtn=$("#enableSoundBtn");
+const dismissSoundBtn=$("#dismissSoundBtn");
+let audioFallback=null, ytPlayer=null, ytReady=false;
+const ytBtn=$("#ytToggle"), ytVol=$("#ytVol");
+const audioCtx=(window.AudioContext||window.webkitAudioContext)?new (window.AudioContext||window.webkitAudioContext)():null;
+
+function setAudioStatus(msg){
+  try{ const el = document.getElementById('audioStatus'); if(el) el.textContent = msg; console.log('AUDIO:', msg); }catch(e){}
+}
+
+async function attemptAutoplay(){
+  if(!window.ytPlayer && !ytPlayer) return;
+  const player = ytPlayer || window.ytPlayer;
+  if(!player || !ytReady) return;
+  setAudioStatus('');
+  try{
+    try{ player.mute(); }catch(e){}
+    await player.playVideo();
+    const volEl = document.getElementById('ytVol');
+    const vol = volEl ? parseInt(volEl.value,10) : 28;
+    try{ player.setVolume(vol); player.unMute && player.unMute(); }catch(e){}
+  }catch(err){
+    console.warn('YT autoplay failed or blocked', err);
+    setAudioStatus('YouTube autoplay blocked');
   }
 }
 
-/****************
- * Setup Screen *
- ****************/
-const playerCountInput = document.getElementById('playerCount');
-playerCountInput.addEventListener('input', e=>{
-  let v = Math.max(1, Math.min(14, Number(e.target.value||1)));
-  renderNameInputs(v);
-});
-renderNameInputs(Number(playerCountInput.value));
+enableSoundBtn.addEventListener('click', enableSound);
+dismissSoundBtn.addEventListener('click', ()=>{ soundConsent.style.display='none'; });
 
-$('#fillSample').addEventListener('click', ()=>{
-  const samples = ["Gomez","Morticia","Wednesday","Pugsley","Fester","Grandmama","Lurch","Thing","Itt","Pubert","Ophelia","Debbie","Abigail","Margaret"];
-  $$('#playerNames input').forEach((el,i)=> el.value = samples[i] || `Player ${i+1}`);
-});
+async function enableSound(){
+  enableSoundBtn.textContent = 'Starting…'; enableSoundBtn.disabled = true;
+  try{ if(audioCtx && audioCtx.state === 'suspended') await audioCtx.resume(); }catch(e){}
+  let played = false;
+  const volEl = document.getElementById('ytVol');
+  const ytToggleBtn = document.getElementById('ytToggle');
+  const volVal = (volEl && parseInt(volEl.value,10)) ? parseInt(volEl.value,10) : 28;
+  try{
+    if(!audioFallback){
+      audioFallback = new Audio('https://cdn.pixabay.com/audio/2022/07/26/audio_124bfae7c2.mp3');
+      audioFallback.loop = true;
+      audioFallback.volume = volVal/100;
+      audioFallback.crossOrigin = 'anonymous';
+    }
+    await audioFallback.play();
+    played = true; enableSoundBtn.textContent = 'Enabled';
+    if(ytToggleBtn) ytToggleBtn.textContent = '⏸ Stop ambience';
+  }catch(err){ console.warn('Local audio play failed', err); }
+  try{
+    if(typeof YT !== 'undefined' && YT && !ytPlayer){ if(typeof onYouTubeIframeAPIReady === 'function') onYouTubeIframeAPIReady(); }
+    if(ytPlayer && ytReady){
+      try{ await ytPlayer.playVideo(); ytPlayer.setVolume(volVal); played = true; if(ytToggleBtn) ytToggleBtn.textContent='⏸ Stop ambience'; if(audioFallback && !audioFallback.paused){ try{ audioFallback.pause(); }catch(e){} } enableSoundBtn.textContent = 'Enabled'; }catch(err){ console.warn('YT play failed', err); }
+    }
+  }catch(e){ console.warn(e); }
+  if(!played){ enableSoundBtn.textContent = 'Try again'; enableSoundBtn.disabled = false; }
+  if(soundConsent){ soundConsent.style.display='none'; soundConsent.setAttribute('aria-hidden','true'); }
+}
 
-$('#playersForm').addEventListener('submit', (e)=>{
-  e.preventDefault();
-  const inputs = $$('#playerNames input');
-  if(inputs.some(i=>!i.value.trim())) return alert('Please enter a name for each player.');
-  game.players = inputs.map(i=>({name:i.value.trim(), answers:[], scores:{}, character:null}));
-  $('#setup').classList.add('hidden');
-  $('#roster').classList.remove('hidden');
-  renderRoster();
-  startQuizFor(0);
+function onYouTubeIframeAPIReady(){
+  ytPlayer = new YT.Player('yt-mount', {
+    width:0, height:0, videoId: YT_VIDEO_ID,
+    playerVars:{ autoplay:1, controls:0, modestbranding:1, loop:1, playlist:YT_VIDEO_ID, playsinline:1 },
+    events:{ onReady:()=>{
+        ytReady=true;
+        try{ ytPlayer.mute(); ytPlayer.playVideo(); }catch(e){}
+        try{
+          const volEl = document.getElementById('ytVol');
+          const vol = volEl ? parseInt(volEl.value,10) : 28;
+          ytPlayer.setVolume(vol);
+        }catch(e){}
+        attemptAutoplay();
+      } }
+  });
+}
+ytBtn.addEventListener('click', async ()=>{
+  if(ytPlayer && ytReady){
+    const st=ytPlayer.getPlayerState?.()??-1;
+    if(st===1){ ytPlayer.pauseVideo(); ytBtn.textContent='▶ Play ambience'; }
+    else{ try{ await ytPlayer.playVideo(); ytPlayer.setVolume(parseInt(ytVol.value,10)); }catch(e){} ytBtn.textContent='⏸ Stop ambience'; if(audioFallback && !audioFallback.paused) audioFallback.pause(); }
+  }else{
+    if(!audioFallback){ audioFallback=new Audio('https://cdn.pixabay.com/audio/2022/07/26/audio_124bfae7c2.mp3'); audioFallback.loop=true; audioFallback.volume=(parseInt(ytVol.value,10)||28)/100; }
+    if(audioFallback.paused){ try{ await audioFallback.play(); }catch(e){} ytBtn.textContent='⏸ Stop ambience'; }
+    else{ audioFallback.pause(); ytBtn.textContent='▶ Play ambience'; }
+  }
 });
+ytVol.addEventListener('input', ()=>{ const v=parseInt(ytVol.value,10)||28; try{ if(ytPlayer&&ytReady) ytPlayer.setVolume(v); }catch(e){} if(audioFallback) audioFallback.volume=v/100; });
 
-/********
- * Quiz *
- ********/
-function startQuizFor(idx){
-  game.currentIndex = idx;
-  const player = game.players[idx];
-  const el = $('#quiz');
-  el.classList.remove('hidden');
-  el.innerHTML = `
-    <div class="progress" aria-hidden="true"><div id="bar"></div></div>
+try{ const saved = localStorage.getItem('afq_yt'); if(saved) document.getElementById('ytUrl').value = saved; }catch(e){}
+
+/* ===== Quiz flow ===== */
+function startQuiz(playerName){
+  $("#setup").classList.add("hidden");
+  const el=$("#quiz"); el.classList.remove("hidden");
+
+  const quiz=Q.map(q=>({q:q.q,o:q.o.slice()}));
+  function shuf(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+  shuf(quiz); quiz.forEach(it=> shuf(it.o));
+
+  el.innerHTML=`
+    <div class="progress"><div id="bar"></div></div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
       <div>
-        <h2>Player: <span class="pill">${escapeHtml(player.name)}</span></h2>
-        <p class="muted small">Question <span id="qNum">1</span> / ${QUESTIONS.length}</p>
+        <h2>Player: <span class="pill">${escapeHtml(playerName)}</span></h2>
+        <p class="small">Question <span id="qNum">1</span> / ${Q.length}</p>
       </div>
-      <button class="btn-ghost" id="abort">Back to setup</button>
+      <button class="btn-ghost" id="abort">Back</button>
     </div>
-    <div id="qWrap" class="fade"></div>
+    <div id="quip" class="small" style="margin:.25rem 0 .5rem;opacity:.9"></div>
+    <div id="qWrap"></div>
     <div class="footer">
       <button class="btn" id="next" disabled>Next</button>
-      <button class="btn-danger" id="resetPlayer">Reset player answers</button>
-    </div>
-  `;
-  $('#abort').onclick = ()=>{ if(confirm('Go back to setup? Progress will be lost.')) location.reload(); };
-  $('#resetPlayer').onclick = ()=>{ if(confirm('Reset this player\'s answers?')){ player.answers=[]; player.scores={}; renderQuestion(0); } };
-  $('#next').onclick = ()=>handleNext();
-  renderQuestion(player.answers.length || 0);
-}
+      <button class="btn-danger" id="reset">Reset answers</button>
+    </div>`;
 
-function renderQuestion(i){
-  const player = game.players[game.currentIndex];
-  const q = QUESTIONS[i];
-  const wrap = $('#qWrap');
-  const progress = ((i)/QUESTIONS.length)*100;
-  $('#bar').style.width = progress + '%';
-  $('#qNum').textContent = (i+1);
-  const name = `q_${i}`;
-  wrap.innerHTML = `
-    <h2 style="font-size:1.1rem">${escapeHtml(q.q)}</h2>
-    <div class="options">
-      ${q.opts.map((o,idx)=>{
-        const id = `${name}_${idx}`;
-        return `<label class="option">
-            <input type="radio" name="${name}" id="${id}" value="${o.tag}">
-            <span>${escapeHtml(o.t)}</span>
-        </label>`;
-      }).join('')}
-    </div>
-  `;
-  $$("input[name='"+name+"']").forEach(r=> r.addEventListener('change', ()=> $('#next').disabled=false));
-}
+  const state={name:playerName,i:0,scores:{},quiz};
+  $("#abort").onclick=()=>{ if(confirm("Go back? Progress will be lost.")) location.reload(); };
+  $("#reset").onclick=()=>{ if(confirm("Reset this player?")){ state.i=0; state.scores={}; renderQ(); } };
+  $("#next").onclick=()=> nextQ(state);
+  renderQ();
 
-function handleNext(){
-  const i = game.players[game.currentIndex].answers.length;
-  const chosen = $$(`input[name='q_${i}']:checked`)[0];
-  if(!chosen) return;
-  const player = game.players[game.currentIndex];
-  player.answers.push(chosen.value);
-  player.scores[chosen.value] = (player.scores[chosen.value]||0)+1;
-  if(player.answers.length < QUESTIONS.length){
-    renderQuestion(player.answers.length);
-  }else{
-    // Finish & assign a unique character
-    const assigned = assignCharacter(player);
-    player.character = assigned.id;
-    game.remaining.delete(assigned.id);
-    showResult(player, assigned);
+  function renderQ(){
+    $("#quip").textContent=pick(QUIZ_QUIPS);
+    $("#bar").style.width=(state.i/Q.length)*100+"%";
+    $("#qNum").textContent=(state.i+1);
+    const q=state.quiz[state.i], name=`q_${state.i}`;
+    $("#qWrap").innerHTML=`
+      <h2 style="font-size:1.1rem">${escapeHtml(q.q)}</h2>
+      <div class="options">
+        ${q.o.map(p=>`<label class="option"><input type="radio" name="${name}" value="${p[1]}"><span>${escapeHtml(p[0])}</span></label>`).join("")}
+      </div>`;
+    $$(`input[name='${name}']`).forEach(r=> r.addEventListener('change', ()=> $("#next").disabled=false));
+  }
+  function nextQ(s){
+    const checked=document.querySelector(`input[name='q_${s.i}']:checked`); if(!checked) return;
+    const tag=checked.value; s.scores[tag]=(s.scores[tag]||0)+1; s.i++;
+    if(s.i<Q.length){ $("#next").disabled=true; renderQ(); } else { finish(s); }
   }
 }
 
-function assignCharacter(player){
-  // Score each remaining character by dot product over tag counts
-  const remainingChars = CHARACTERS.filter(c=>game.remaining.has(c.id));
-  if(remainingChars.length === 0){
-    return { id:"none", name:"No one left!", blurb:"All characters have already been matched.", tags:{} };
+function scoreFor(playerScores,c){
+  let base=0; for(const [t,count] of Object.entries(playerScores)){ base+=(c.tags[t]||0)*count; }
+  const distinct=Object.keys(c.tags).filter(t=>playerScores[t]).length;
+  const diversity=Math.max(0, distinct-1)*0.6;
+  const sig=playerScores[c.sig]?0.8:0;
+  return base+diversity+sig;
+}
+const LS_KEY_WRAP=k=>`afq_${EVENT}_${k}`;
+async function loadAssigned(){
+  if(supabaseClient){
+    const {data,error}=await supabaseClient.from('assignments').select('character').eq('event',EVENT);
+    if(error){ console.warn(error); return new Set(JSON.parse(localStorage.getItem(LS_KEY_WRAP("assigned"))||"[]")); }
+    return new Set(data.map(r=>r.character));
   }
-  const scores = remainingChars.map(c=>{
-    let s = 0;
-    for(const [tag,count] of Object.entries(player.scores)){
-      s += (c.tags[tag]||0)*count;
+  return new Set(JSON.parse(localStorage.getItem(LS_KEY_WRAP("assigned")))||[]);
+}
+async function tryReserve(name, preferredId){
+  const assigned=await loadAssigned();
+  const remaining=CHARACTERS.map(c=>c.id).filter(id=>!assigned.has(id));
+  let pickId=remaining.includes(preferredId)?preferredId:remaining[0];
+  if(!pickId) return null;
+  if(supabaseClient){
+    const {error}=await supabaseClient.from('assignments').insert({event:EVENT,name,character:pickId});
+    if(error){
+      const upd=await loadAssigned();
+      const rest=CHARACTERS.map(c=>c.id).filter(id=>!upd.has(id));
+      if(!rest.length) return null;
+      pickId=rest[0];
+      const {error:e2}=await supabaseClient.from('assignments').insert({event:EVENT,name,character:pickId});
+      if(e2){ console.warn(e2); return null; }
+      persistLocal(pickId,name); return pickId;
     }
-    return { c, score:s };
-  });
-  scores.sort((a,b)=> b.score - a.score || Math.random()-0.5);
-  // If all zero, pick randomly from remaining
-  const top = scores[0].score>0 ? scores.filter(x=>x.score===scores[0].score) : scores;
-  return top[Math.floor(Math.random()*top.length)].c;
+    persistLocal(pickId,name); return pickId;
+  } else { persistLocal(pickId,name); return pickId; }
+}
+function persistLocal(id,name){
+  const arr=JSON.parse(localStorage.getItem(LS_KEY_WRAP("assigned"))||"[]");
+  if(!arr.includes(id)){ arr.push(id); localStorage.setItem(LS_KEY_WRAP("assigned"), JSON.stringify(arr)); }
+  const roster=JSON.parse(localStorage.getItem(LS_KEY_WRAP("roster"))||"[]");
+  roster.push({name,character:id,at:Date.now()});
+  localStorage.setItem(LS_KEY_WRAP("roster"), JSON.stringify(roster));
 }
 
-function showResult(player, character){
-  const el = $('#result');
-  el.classList.remove('hidden');
-  el.innerHTML = `
-    <h2 style="font-size:1.25rem;margin-bottom:.5rem">${escapeHtml(player.name)}, you are…</h2>
-    <div class="grid grid-cols-2">
-      <div class="card web" style="padding:16px">
-        <div style="display:flex;align-items:center;gap:10px;justify-content:space-between">
+async function finish(s){
+  const assignedSet=await loadAssigned();
+  const remaining=CHARACTERS.filter(c=>!assignedSet.has(c.id));
+  if(!remaining.length){ showResult(s.name,{id:"none",name:"No one left!",blurb:"All characters taken this event.",img:"",traits:[],quote:""}); return; }
+  const scored=remaining.map(c=>({c,score:scoreFor(s.scores,c)+(Math.random()-0.5)*0.5})).sort((a,b)=>b.score-a.score);
+  const top=scored[0].score, pool=scored.filter(x=>Math.abs(x.score-top)<=1e-6);
+  const preferred=(pool.length?pool:scored)[Math.floor(Math.random()*(pool.length?pool.length:1))].c.id;
+  const reserved=await tryReserve(s.name,preferred);
+  if(!reserved){ alert("All characters are taken for this event."); location.reload(); return; }
+  showResult(s.name, CHAR_BY_ID[reserved]);
+}
+
+function showResult(name,character){
+  $("#quiz").classList.add("hidden");
+  const el=$("#result"); el.classList.remove("hidden");
+  const tags=Object.keys(character.tags||{});
+  const one=ONE_LINERS[character.id]?`<div class="small" style="margin-top:6px;opacity:.9">“${escapeHtml(ONE_LINERS[character.id])}”</div>`:"";
+  el.innerHTML=`
+    <h2 style="font-size:1.25rem;margin-bottom:.5rem">${escapeHtml(name)}, you are…</h2>
+    <div class="grid grid-2">
+      <div class="card" style="padding:16px">
+        <div style="display:flex;gap:16px;align-items:flex-start">
+          <img class="portrait" src="${escapeAttr(character.img||'')}" alt="${escapeAttr(character.name||'')}" onerror="this.style.visibility='hidden'">
           <div>
-            <div class="pill">Unique match locked</div>
+            <div class="pill">Unique match locked for event “${escapeHtml(EVENT)}”</div>
             <h3 style="margin:.6rem 0 0;font-size:1.4rem">${escapeHtml(character.name)}</h3>
-            <p class="muted">${escapeHtml(character.blurb)}</p>
+            ${one}
+            <p class="small" style="margin-top:8px">${escapeHtml(character.blurb||'')}</p>
+            <div class="footer">${tags.map(t=>`<span class="pill">#${t}</span>`).join('')}</div>
           </div>
         </div>
         <div class="footer">
-          ${Object.keys(character.tags).map(t=>`<span class="tag">#${t}</span>`).join('')}
+          <button class="btn" id="printBtn">🖨️ Print certificate</button>
+          <button class="btn-ghost" id="againBtn">Start over</button>
         </div>
-      </div>
-      <div>
-        <p class="muted">Share your result with friends by sending them this page link. In party mode, each character can only appear once—no duplicates!</p>
-        <div class="footer">
-          <button class="btn" id="nextPlayer">Next player</button>
-          <button class="btn-ghost" id="revealRoster">Show roster</button>
-          <button class="btn-danger" id="resetAll">Reset game</button>
-        </div>
-      </div>
-    </div>
-  `;
-  $('#nextPlayer').onclick = ()=>{
-    const i = game.currentIndex+1;
-    if(i < game.players.length) startQuizFor(i); else { alert('All players finished!'); renderRoster(true);} 
-  };
-  $('#revealRoster').onclick = ()=> renderRoster(true);
-  $('#resetAll').onclick = ()=>{ if(confirm('Reset everything and start over?')) location.reload(); };
-  renderRoster();
-}
-
-/***********
- * Roster  *
- ***********/
-function renderRoster(expand=false){
-  const el = $('#roster');
-  const remaining = CHARACTERS.filter(c=>game.remaining.has(c.id));
-  const taken = CHARACTERS.filter(c=>!game.remaining.has(c.id));
-
-  const playersList = game.players.map((p,i)=>{
-    const ch = p.character ? CHARACTERS.find(c=>c.id===p.character).name : '—';
-    return `<tr><td class="small muted">${i+1}</td><td>${escapeHtml(p.name)}</td><td>${escapeHtml(ch)}</td></tr>`;
-  }).join('');
-
-  el.innerHTML = `
-    <h2>Roster</h2>
-    <div class="grid grid-cols-2">
-      <div class="card" style="overflow:auto">
-        <h3 style="margin-top:0">Players</h3>
-        <table style="width:100%;border-collapse:collapse">
-          <thead><tr class="small muted"><th style="text-align:left;padding:6px 0">#</th><th style="text-align:left">Name</th><th style="text-align:left">Character</th></tr></thead>
-          <tbody>
-            ${playersList||'<tr><td colspan="3" class="muted small">No players yet.</td></tr>'}
-          </tbody>
-        </table>
       </div>
       <div class="card">
-        <h3 style="margin-top:0">${expand? 'Assigned & Remaining' : 'Characters remaining'}</h3>
-        ${expand ? (
-          `<div class="small muted" style="margin-bottom:6px">Assigned (${taken.length}/14)</div>
-           <div class="footer" style="margin-bottom:14px">${taken.map(c=>`<span class="tag">${escapeHtml(c.name)}</span>`).join('')||'<span class="muted small">None yet</span>'}</div>`
-        ) : ''}
-        <div class="small muted" style="margin-bottom:6px">Available (${remaining.length}/14)</div>
-        <div class="footer">${remaining.map(c=>`<span class="tag">${escapeHtml(c.name)}</span>`).join('')||'<span class="muted small">All assigned</span>'}</div>
+        <h2>What to do</h2>
+        <ol class="small">
+          <li>Click <em>Print certificate</em> to get your Addams CV.</li>
+          <li>Use the same event code for friends to prevent duplicates.</li>
+          <li>Share: <code>${escapeHtml(location.origin+location.pathname)}?event=${escapeHtml(EVENT)}</code></li>
+        </ol>
       </div>
-    </div>
-  `;
+    </div>`;
+  $("#againBtn").onclick=()=>location.reload();
+  $("#printBtn").onclick=()=>{
+    $("#certEvent").textContent=EVENT;
+    $("#certImg").src=character.img||"";
+    $("#certTitle").textContent=pick(CERT_TITLES);
+    $("#certWho").textContent=`You are… ${character.name}`;
+    $("#certName").textContent=`Name: ${name}`;
+    $("#certTraits").innerHTML=(character.traits||[]).map(t=>`<li>${escapeHtml(t)}</li>`).join("");
+    $("#certQuote").textContent=character.quote||"";
+    $("#printArea").classList.remove("hidden");
+    setTimeout(()=>window.print(),60);
+  };
 }
 
-/***************
- * Utilities   *
- ***************/
-function escapeHtml(s){
-  return s.replace(/[&<>'"]/g, c=> ({'&':'&amp;','<':'&lt;','>':'&gt;','\'':'&#39;','"':'&quot;'}[c]));
-}
+/* Utils */
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+function escapeHtml(s){ return String(s||"").replace(/[&<>'"]/g, c=> ({'&':'&amp;','<':'&lt;','>':'&gt;','\'':'&#39;','"':'&quot;'}[c])); }
+function escapeAttr(s){ return String(s||"").replace(/"/g,'&quot;'); }
 </script>
 </body>
 </html>
-
