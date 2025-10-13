@@ -459,7 +459,7 @@ No two mortals may claim the same identity under one event’s moon.
         <div><strong>Traits</strong></div>
         <ul id="certTraits"></ul>
         <blockquote id="certQuote" style="margin-top:14px;opacity:.9"></blockquote>
-        <footer>Halloween Quiz • <span id="certEvent">default</span></footer>
+        <footer>Halloween Quiz</footer>
       </div>
     </div>
   </div>
@@ -672,8 +672,9 @@ function extractYouTubeID(input){
 let YT_VIDEO_ID = extractYouTubeID(localStorage.getItem('afq_yt') || "zOYpduX68js");
 
 /* Optional shared pool */
-const SUPABASE_URL=""; const SUPABASE_ANON=""; let supabaseClient=null;
-if(SUPABASE_URL && SUPABASE_ANON) supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+const SUPABASE_URL = "https://gmnxssgfaqzgshhovbkr.supabase.co";
+const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdtbnhzc2dmYXF6Z3NoaG92YmtyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAyMzQzMTIsImV4cCI6MjA3NTgxMDMxMn0.R0oYbU0K4XSQUozbklXyHEHreI55H1PI6RHUDDmSRAo";
+let supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
 /* ===== Copy ===== */
 const TAGLINES=["please scream responsibly.","spook now, ask questions never.","100% handmade by Thing.","where normal goes to die (politely).","macabre, but make it cozy.","gothic vibes, zero jump scares.","enter if you dare… to be fabulous.","we put the fun in funeral chic.","grave expectations. delightful results.","bring your own cackle.","licensed to chill.","fangs for stopping by.","haunted by good taste.","you rang? your quiz awaits.","mood: eternal night, partial sarcasm."];
@@ -723,9 +724,6 @@ const Q=[{q:"Pick your ideal spooky soirée:",o:[["Moonlit fencing duel","flambo
 
 /* ===== Landing -> Quiz ===== */
 const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
-const params=new URLSearchParams(location.search);
-let EVENT=(params.get("event")||"default").trim().slice(0,32)||"default";
-const LS_KEY=k=>`afq_${EVENT}_${k}`;
 $("#nameForm").addEventListener("submit",e=>{
   e.preventDefault();
   const n=$("#playerName").value.trim(); if(!n) return;
@@ -880,40 +878,36 @@ function scoreFor(playerScores,c){
   const sig=playerScores[c.sig]?0.8:0;
   return base+diversity+sig;
 }
-const LS_KEY_WRAP=k=>`afq_${EVENT}_${k}`;
 async function loadAssigned(){
-  if(supabaseClient){
-    const {data,error}=await supabaseClient.from('assignments').select('character').eq('event',EVENT);
-    if(error){ console.warn(error); return new Set(JSON.parse(localStorage.getItem(LS_KEY_WRAP("assigned"))||"[]")); }
-    return new Set(data.map(r=>r.character));
-  }
-  return new Set(JSON.parse(localStorage.getItem(LS_KEY_WRAP("assigned")))||[]);
+  if(!supabaseClient) throw new Error("Supabase not configured.");
+  const { data, error } = await supabaseClient
+    .from('assignments')
+    .select('character');
+  if(error) { console.warn(error); return new Set(); }
+  return new Set((data||[]).map(r=>r.character));
 }
+
 async function tryReserve(name, preferredId){
-  const assigned=await loadAssigned();
-  const remaining=CHARACTERS.map(c=>c.id).filter(id=>!assigned.has(id));
-  let pickId=remaining.includes(preferredId)?preferredId:remaining[0];
-  if(!pickId) return null;
-  if(supabaseClient){
-    const {error}=await supabaseClient.from('assignments').insert({event:EVENT,name,character:pickId});
-    if(error){
-      const upd=await loadAssigned();
-      const rest=CHARACTERS.map(c=>c.id).filter(id=>!upd.has(id));
-      if(!rest.length) return null;
-      pickId=rest[0];
-      const {error:e2}=await supabaseClient.from('assignments').insert({event:EVENT,name,character:pickId});
-      if(e2){ console.warn(e2); return null; }
-      persistLocal(pickId,name); return pickId;
-    }
-    persistLocal(pickId,name); return pickId;
-  } else { persistLocal(pickId,name); return pickId; }
-}
-function persistLocal(id,name){
-  const arr=JSON.parse(localStorage.getItem(LS_KEY_WRAP("assigned"))||"[]");
-  if(!arr.includes(id)){ arr.push(id); localStorage.setItem(LS_KEY_WRAP("assigned"), JSON.stringify(arr)); }
-  const roster=JSON.parse(localStorage.getItem(LS_KEY_WRAP("roster"))||"[]");
-  roster.push({name,character:id,at:Date.now()});
-  localStorage.setItem(LS_KEY_WRAP("roster"), JSON.stringify(roster));
+  if(!supabaseClient) throw new Error("Supabase not configured.");
+  // first attempt with the preferred
+  let { error } = await supabaseClient
+    .from('assignments')
+    .insert({ name, character: preferredId });
+
+  if(!error) return preferredId; // success
+
+  // if conflict, pick the next available and try again
+  const assigned = await loadAssigned();
+  const remaining = CHARACTERS.map(c=>c.id).filter(id=>!assigned.has(id));
+  if(!remaining.length) return null;
+
+  const nextId = remaining[0];
+  const { error: e2 } = await supabaseClient
+    .from('assignments')
+    .insert({ name, character: nextId });
+
+  if(e2){ console.warn(e2); return null; }
+  return nextId;
 }
 
 async function finish(s){
@@ -940,7 +934,7 @@ function showResult(name,character){
         <div style="display:flex;gap:16px;align-items:flex-start">
           <img class="portrait" src="${escapeAttr(character.img||'')}" alt="${escapeAttr(character.name||'')}" onerror="this.style.visibility='hidden'">
           <div>
-            <div class="pill">Unique match locked for event “${escapeHtml(EVENT)}”</div>
+            <div class="pill">Unique match locked</div>
             <h3 style="margin:.6rem 0 0;font-size:1.4rem">${escapeHtml(character.name)}</h3>
             ${one}
             <p class="small" style="margin-top:8px">${escapeHtml(character.blurb||'')}</p>
@@ -957,13 +951,12 @@ function showResult(name,character){
         <ol class="small">
           <li>Click <em>Print certificate</em> to get your Addams CV.</li>
           <li>Use the same event code for friends to prevent duplicates.</li>
-          <li>Share: <code>${escapeHtml(location.origin+location.pathname)}?event=${escapeHtml(EVENT)}</code></li>
+          <li>Share: <code>${escapeHtml(location.origin+location.pathname)}</code></li>
         </ol>
       </div>
     </div>`;
   $("#againBtn").onclick=()=>location.reload();
   $("#printBtn").onclick=()=>{
-    $("#certEvent").textContent=EVENT;
     $("#certImg").src=character.img||"";
     $("#certTitle").textContent=pick(CERT_TITLES);
     $("#certWho").textContent=`You are… ${character.name}`;
